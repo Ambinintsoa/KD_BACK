@@ -9,5 +9,10 @@ const UtilisateurSchema=new mongoose.Schema({
     contact:{type:String,required:false},
     role:{type:String,required:true},
     poste:{type:String,required:false},
-});
+    genre:{type:String,required:true},
+    date_de_naissance:{type:Date,required:true}
+    
+},{
+    timestamps: true  // Cette option ajoutera automatiquement createdAt et updatedAt
+  });
 module.exports=mongoose.model('Utilisateur',UtilisateurSchema);

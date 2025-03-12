@@ -11,4 +11,4 @@ const RendezVousSchema = new mongoose.Schema({
 }, {
     timestamps: true // Option de timestamp pour createdAt et updatedAt
 });
-module.exports = mongoose.model('Facture', RendezVousSchema);
+module.exports = mongoose.model('RendezVous', RendezVousSchema);

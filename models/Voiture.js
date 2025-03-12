@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const VoitureSchema = new mongoose.Schema({
     immatriculation: { type: String, required: true },
-    kilometrage: { type: double, required: false },
+    kilometrage: { type: Number, required: false },
     marque: { type: String, required: true },
     modele: { type: String, required: true },
     client: { type: mongoose.Schema.Types.ObjectId, ref: "Utilisateur", required: true },

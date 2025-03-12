@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const DetailsFactureSchema = new mongoose.Schema({
-    prix: { type: double, required: true },
+    prix: { type:Number, required: true },
     facture: { type: mongoose.Schema.Types.ObjectId, ref: "Facture", required: true },
     service: { type: mongoose.Schema.Types.ObjectId, ref: "Service", required: false  },
     produit: { type: mongoose.Schema.Types.ObjectId, ref: "Produit", required: false },

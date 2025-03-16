@@ -54,5 +54,5 @@ app.listen(port, () => {
 // require('./default_data/generateDefaultTaches');
 
 // require('./default_data/AvisClient');
-require('./default_data/generateDefaultsStockProduit');
+// require('./default_data/generateDefaultsStockProduit');
 

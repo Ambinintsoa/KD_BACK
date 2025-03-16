@@ -2,13 +2,7 @@ const Devis = require('../models/Devis'); // Remplace par le chemin correct de t
 const Utilisateur = require('../models/Utilisateur'); // Remplace par le chemin correct de ton modèle Utilisateur
 const Voiture = require('../models/Voiture'); // Remplace par le chemin correct de ton modèle Voiture
 
-// Connexion à MongoDB
-mongoose.connect("mongodb://localhost:27017/votreBaseDeDonnees", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-.then(() => console.log("Connexion réussie à MongoDB"))
-.catch((err) => console.log("Erreur de connexion à MongoDB:", err));
+
 
 // Fonction pour insérer des devis par défaut
 const generateDefaultDevis = async () => {

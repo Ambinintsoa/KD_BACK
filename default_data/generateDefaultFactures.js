@@ -1,14 +1,7 @@
-const mongoose = require("mongoose");
+
 const Facture = require('../models/facture'); // Remplace par le chemin correct de ton modèle Facture
 const Utilisateur = require('../models/utilisateur'); // Remplace par le chemin correct de ton modèle Utilisateur
 
-// Connexion à MongoDB
-mongoose.connect("mongodb://localhost:27017/votreBaseDeDonnees", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-.then(() => console.log("Connexion réussie à MongoDB"))
-.catch((err) => console.log("Erreur de connexion à MongoDB:", err));
 
 // Fonction pour insérer des factures par défaut
 const generateDefaultFactures = async () => {

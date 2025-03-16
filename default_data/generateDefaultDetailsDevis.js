@@ -1,18 +1,10 @@
-const mongoose = require("mongoose");
-const Utilisateur=require('../models/Utilisateur');
 
 const DetailsDevis = require('../models/DetailsDevis'); // Remplace par le chemin correct de ton modèle DetailsDevis
 const Devis = require('../models/Devis'); // Remplace par le chemin correct de ton modèle Devis
 const Service = require('../models/Service'); // Remplace par le chemin correct de ton modèle Service
 const UsageProduitService = require('../models/UsageProduitService'); // Remplace par le chemin correct de ton modèle UsageProduitService
 
-// Connexion à MongoDB
-mongoose.connect("mongodb://localhost:27017/votreBaseDeDonnees", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-.then(() => console.log("Connexion réussie à MongoDB"))
-.catch((err) => console.log("Erreur de connexion à MongoDB:", err));
+
 
 // Fonction pour insérer des détails de devis par défaut
 const generateDefaultDetailsDevis = async () => {

@@ -28,3 +28,20 @@ app.get("/", (req, res) => {
 app.listen(port, () => {
   console.log(`🚀 Serveur démarré sur http://localhost:${port}`);
 });
+
+
+require('./default_data/default_data_user');
+require('./default_data/generateDefaultCars');
+require('./default_data/generateDefaultDevis');
+require('./default_data/generateDefaulDetailsDevis');
+require('./default_data/generateDefaultFactures');
+require('./default_data/generateDefaultDetailsFactures');
+require('./default_data/generateDefaultPaiements');
+require('./default_data/generateDefaultCategories');
+require('./default_data/ServiceDefaultData');
+require('./default_data/generateDefaultProduits');
+require('./default_data/generateDefaultUsageProduitService');
+require('./default_data/generateDefaultRendezVous');
+require('./default_data/generateDefaultTaches');
+require('./default_data/AvisClient');
+

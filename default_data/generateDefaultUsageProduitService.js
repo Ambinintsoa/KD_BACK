@@ -1,15 +1,8 @@
-const mongoose = require("mongoose");
+
 const UsageProduitService = require('../models/usageProduitService');  // Remplace par le chemin correct de ton modèle UsageProduitService
 const Service = require('../models/service'); // Remplace par le chemin correct de ton modèle Service
 const Produit = require('../models/produit'); // Remplace par le chemin correct de ton modèle Produit
 
-// Connexion à MongoDB
-mongoose.connect("mongodb://localhost:27017/votreBaseDeDonnees", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-.then(() => console.log("Connexion réussie à MongoDB"))
-.catch((err) => console.log("Erreur de connexion à MongoDB:", err));
 
 // Fonction pour insérer des données pour UsageProduitService
 const generateDefaultUsageProduitService = async () => {

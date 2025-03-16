@@ -1,17 +1,8 @@
-const mongoose = require("mongoose");
+
 const Facture = require('../models/Facture'); // Remplace par le chemin correct de ton modèle Facture
 const DetailsFacture = require('../models/DetailsFacture'); // Remplace par le chemin correct de ton modèle DetailsFacture
 const Service = require('../models/Service'); // Remplace par le chemin correct de ton modèle Service
 const Produit = require('../models/Produit'); // Remplace par le chemin correct de ton modèle Produit
-
-
-// Connexion à MongoDB
-mongoose.connect("mongodb://localhost:27017/votreBaseDeDonnees", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-.then(() => console.log("Connexion réussie à MongoDB"))
-.catch((err) => console.log("Erreur de connexion à MongoDB:", err));
 
 // Fonction pour insérer des détails de facture par défaut
 const generateDefaultDetailsFactures = async () => {
@@ -55,4 +46,18 @@ const generateDefaultDetailsFactures = async () => {
         prix: 30,
         facture: factures[2]._id,
         service: services.length > 2 ? services[2]._id : null,
-        produit: produits.length > 2
+        produit: produits.length > 2 ? produits[2]._id : null,
+        quantite: 3
+      }
+    ];
+
+    // Insérer les détails de facture dans la base de données
+    const result = await DetailsFacture.insertMany(detailsFactures);
+    console.log("Détails de facture insérés avec succès:", result);
+  } catch (err) {
+    console.log("Erreur lors de l'insertion des détails de facture:", err);
+  }
+};
+
+// Appeler la fonction pour insérer les détails par défaut
+generateDefaultDetailsFactures();

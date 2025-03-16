@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+
 const Tache = require('../models/Tache'); // Remplace par le chemin correct de ton modèle Tache
 const Service = require('../models/Service'); // Remplace par le chemin correct de ton modèle Service
 const RendezVous = require('../models/RendezVous'); // Remplace par le chemin correct de ton modèle RendezVous

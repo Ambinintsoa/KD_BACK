@@ -1,14 +1,7 @@
-const mongoose = require("mongoose");
+
 const StockProduit = require('../models/StockProduit'); // Remplace par le chemin correct de ton modèle StockProduit
 const Produit = require('../models/Produit'); // Remplace par le chemin correct de ton modèle Produit
 
-// Connexion à MongoDB
-mongoose.connect("mongodb://localhost:27017/votreBaseDeDonnees", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-.then(() => console.log("Connexion réussie à MongoDB"))
-.catch((err) => console.log("Erreur de connexion à MongoDB:", err));
 
 // Fonction pour générer des données par défaut dans le stock
 const generateDefaultStockData = async () => {

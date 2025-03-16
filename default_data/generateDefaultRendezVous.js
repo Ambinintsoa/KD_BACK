@@ -1,15 +1,8 @@
-const mongoose = require("mongoose");
+
 const RendezVous = require('../models/RendezVous'); // Remplace par le chemin correct de ton modèle RendezVous
 const Utilisateur = require('../models/Utilisateur'); // Remplace par le chemin correct de ton modèle Utilisateur
 const Voiture = require('../models/Voiture'); // Remplace par le chemin correct de ton modèle Voiture
 
-// Connexion à MongoDB
-mongoose.connect("mongodb://localhost:27017/votreBaseDeDonnees", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-.then(() => console.log("Connexion réussie à MongoDB"))
-.catch((err) => console.log("Erreur de connexion à MongoDB:", err));
 
 // Fonction pour insérer des rendez-vous par défaut
 const generateDefaultRendezVous = async () => {

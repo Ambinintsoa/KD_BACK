@@ -1,4 +1,6 @@
 const AvisClient=require('../models/AvisClient');
+const Utilisateur = require('../models/Utilisateur'); // Remplace par le chemin correct de ton modèle Utilisateur
+
 // Fonction pour insérer des avis par défaut
 const generateDefaultAvis = async () => {
   try {

@@ -18,6 +18,7 @@ mongoose.connect(process.env.MONGO_URI, {
    }).then(() => console.log("MongoDB connecté")) 
      .catch(err => console.log(err)); 
 
+app.use('/user',require('./routers/UtilisateurRouter'));
 
 // Route principale
 app.get("/", (req, res) => {
@@ -28,3 +29,4 @@ app.get("/", (req, res) => {
 app.listen(port, () => {
   console.log(`🚀 Serveur démarré sur http://localhost:${port}`);
 });
+

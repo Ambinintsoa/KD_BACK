@@ -1,0 +1,119 @@
+{
+	"info": {
+		"_postman_id": "3093e083-a371-42d7-813b-e0c0e3f0b087",
+		"name": "Garage",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "32616907"
+	},
+	"item": [
+		{
+			"name": "Utilisateur",
+			"item": [
+				{
+					"name": "register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"my_email@gmail.com\",\r\n    \"mot_de_passe\":\"password\",\r\n    \"genre\":\"Femme\",\r\n    \"nom\":\"nom1\",\r\n    \"prenom\":\"Joel\",\r\n    \"adresse\":\"home\",\r\n    \"date_de_naissance\":\"2003-03-06\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/user/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"my_email@gmail.com\",\r\n    \"mot_de_passe\":\"password\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/user/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "user",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "refresh_token",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2Q4NWNkYTZkODJmOTZhMGRjYWE4ZjQiLCJ1c2VybmFtZSI6Im5vbTEgSm9lbCIsInJvbGUiOiJDbGllbnQiLCJlbWFpbCI6Im15X2VtYWlsQGdtYWlsLmNvbSIsImlhdCI6MTc0MjIzNjIxNywiZXhwIjoxNzQyMjM2ODE3fQ.cfKDKIqWa55t-A4VCOWMjiqB4QmXwI9SAnK6wKetijQ",
+			"type": "string"
+		}
+	]
+}

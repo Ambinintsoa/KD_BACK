@@ -21,6 +21,7 @@ mongoose.connect(process.env.MONGO_URI, {
 
 app.use('/user',require('./routers/UtilisateurRouter'));
 app.use('/produit',require('./routers/ProduitRouter'));
+app.use('/categorie',require('./routers/CategorieRouter'));
 
 // Route principale
 app.get("/", (req, res) => {

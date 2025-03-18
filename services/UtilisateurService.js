@@ -11,7 +11,7 @@ exports.saveUser = async (userData) => {
         let email = user.email;
         if (! await Utilisateur.findOne({ email })) {
             user.mot_de_passe = await bcrypt.hash(user.mot_de_passe, 10);
-            user.role = "Client";
+            user.role = user.role || "Client";
             user.save();
 
         } else {

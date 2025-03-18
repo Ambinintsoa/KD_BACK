@@ -1,0 +1,78 @@
+const Voiture = require('../models/Voiture');
+
+// enregistre un voiture
+exports.save = async (voitureData) => {
+    try {
+        const voiture = new Voiture(voitureData);
+        if (!voiture.immatriculation || !voiture.marque || !voiture.modele || !voiture.client) throw new Error("Le numero d'immatriculation,la marque et modèle de la voiture sont obligatoires !");
+
+        if (await Voiture.countDocuments({ immatriculation: voiture.immatriculation.trim() }) < 1) {
+            voiture.immatriculation = voiture.immatriculation.trim();
+            voiture.marque = voiture.marque.trim();
+            voiture.modele = voiture.modele.trim();
+
+            await voiture.save();
+        }else{
+            throw new Error("Il y a déjà une voiture portant ce numéro d'immatriculation");
+        }
+        
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
+// liste de voitures avec pagination
+exports.read = async (offset,limit) => {
+    try {
+        return await Voiture.find().skip(offset).limit(limit);
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
+// liste de voitures avec pagination et filtre => condition "et"
+exports.readBy = async (offset,limit,data) => {
+    try {
+        return await Voiture.find(data).skip(offset).limit(limit);
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
+//retourne un voiture a partir de son id
+exports.readById = async (id) => {
+    try {
+        return await Voiture.findOne({_id:id});
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
+
+// modifie les données Obliger d'avoir _id
+exports.update = async(data)=>{
+    try {
+        const voiture = new Voiture(data);
+        const initial_voiture = await Voiture.findOne({ _id:voiture._id });
+        if(! initial_voiture) throw new Error("Aucune voiture correspondante !");
+        
+        initial_voiture.immatriculation =voiture.immatriculation.trim(); // Mise à jour de l'attribut
+        initial_voiture.marque=voiture.marque.trim();
+        voiture.modele = voiture.modele.trim();
+
+        await initial_voiture.save(); // Sauvegarde les modifications
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
+//supprime un voiture a partir de l'id
+exports.delete=async(id)=>{
+    try {
+        const voitureSupprime = await Voiture.findByIdAndDelete(id);
+        console.log(voitureSupprime); // Affiche le voiture supprimé
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}

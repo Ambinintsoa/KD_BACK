@@ -8,8 +8,8 @@ categoryRouter.post("/save",[verifyToken,RoleMiddleware.adminRole], CategorieCon
 categoryRouter.put("/update",[verifyToken,RoleMiddleware.adminRole], CategorieController.update);
 categoryRouter.delete("/:id",[verifyToken,RoleMiddleware.adminRole], CategorieController.delete);
 
-categoryRouter.get("/",[verifyToken], CategorieController.read);
-categoryRouter.get("/search",[verifyToken], CategorieController.readBy);
+categoryRouter.get("/:page",[verifyToken], CategorieController.read);
+categoryRouter.get("/search/:page",[verifyToken], CategorieController.readBy);
 categoryRouter.get("/:id",[verifyToken], CategorieController.readById);
 
 

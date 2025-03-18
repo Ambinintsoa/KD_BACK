@@ -8,8 +8,8 @@ productRouter.post("/save",[verifyToken,RoleMiddleware.adminRole], ProduitContro
 productRouter.put("/update",[verifyToken,RoleMiddleware.adminRole], ProduitController.update);
 productRouter.delete("/:id",[verifyToken,RoleMiddleware.adminRole], ProduitController.delete);
 
-productRouter.get("/",[verifyToken], ProduitController.read);
-productRouter.get("/search",[verifyToken], ProduitController.readBy);
+productRouter.get("/:page",[verifyToken], ProduitController.read);
+productRouter.get("/search/:page",[verifyToken], ProduitController.readBy);
 productRouter.get("/:id",[verifyToken], ProduitController.readById);
 
 

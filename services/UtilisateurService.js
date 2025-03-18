@@ -8,10 +8,16 @@ exports.saveUser = async (userData) => {
         const user = new Utilisateur(userData);
         if (!user.email || !user.mot_de_passe) throw new Error("Email et mot de passe sont obligatoires !");
 
-        let email = user.email;
+        let email = user.email.trim();
         if (! await Utilisateur.findOne({ email })) {
-            user.mot_de_passe = await bcrypt.hash(user.mot_de_passe, 10);
+            user.mot_de_passe = await bcrypt.hash(user.mot_de_passe.trim(), 10);
             user.role = user.role || "Client";
+            user.nom=user.nom.trim();
+            user.prenom=user.prenom.trim();
+            user.email=user.email.trim();
+            user.genre=user.genre.trim() || "Indefini";
+            user.adresse = (user.adresse?.trim() || '');
+            user.contact = (user.contact?.trim() || '');
             user.save();
 
         } else {

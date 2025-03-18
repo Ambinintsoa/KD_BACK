@@ -10,7 +10,7 @@ categoryRouter.delete("/:id",[verifyToken,RoleMiddleware.adminRole], CategorieCo
 
 categoryRouter.get("/:page",[verifyToken], CategorieController.read);
 categoryRouter.get("/search/:page",[verifyToken], CategorieController.readBy);
-categoryRouter.get("/:id",[verifyToken], CategorieController.readById);
+categoryRouter.get("/id/:id",[verifyToken], CategorieController.readById);
 
 
 module.exports = categoryRouter;

@@ -16,7 +16,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"email\":\"my_email@gmail.com\",\r\n    \"mot_de_passe\":\"password\",\r\n    \"genre\":\"Femme\",\r\n    \"nom\":\"nom1\",\r\n    \"prenom\":\"Joel\",\r\n    \"adresse\":\"home\",\r\n    \"date_de_naissance\":\"2003-03-06\"\r\n}",
+							"raw": "{\r\n    \"email\":\"my_email2@gmail.com\",\r\n    \"mot_de_passe\":\"password\",\r\n    \"genre\":\"Femme\",\r\n    \"nom\":\"nom1\",\r\n    \"prenom\":\"Joel\",\r\n    \"adresse\":\"home\",\r\n    \"date_de_naissance\":\"2003-03-06\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -75,7 +75,885 @@
 					"name": "refresh_token",
 					"request": {
 						"method": "GET",
-						"header": []
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/user/refresh",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Produit",
+			"item": [
+				{
+					"name": "save",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"nom_produit\":\"Gaz\",\r\n    \"unite\":\"m3\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/produit/save",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"produit",
+								"save"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": " {\r\n        \"_id\": \"67d72250acbe9fa74f74d022\",\r\n        \"nom_produit\": \"Batterie 2CHV\",\r\n        \"unite\": \"pièce\"\r\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/produit/update",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"produit",
+								"update"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/produit/67d9954e7555a43b1a7525f9",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"produit",
+								"67d9954e7555a43b1a7525f9"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "read",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/produit/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"produit",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "readBy",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"unite\":\"pièce\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/produit/search/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"produit",
+								"search",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "readById",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/produit/id/67d72250acbe9fa74f74d022",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"produit",
+								"id",
+								"67d72250acbe9fa74f74d022"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Categorie",
+			"item": [
+				{
+					"name": "save",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"nom_categorie\":\"Pneumatique\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/categorie/save",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"categorie",
+								"save"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": " {\r\n        \"_id\": \"67d9b4748feda51322abb7d2\",\r\n        \"nom_categorie\": \"Pneumatique A\"\r\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/categorie/update",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"categorie",
+								"update"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/categorie/67d9b4748feda51322abb7d2",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"categorie",
+								"67d9b4748feda51322abb7d2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "read",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/categorie/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"categorie",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "readBy",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"nom_categorie\": \"Révision générale\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/categorie/search/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"categorie",
+								"search",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "readById",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/categorie/id/67d721e250542fa43d9250b6",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"categorie",
+								"id",
+								"67d721e250542fa43d9250b6"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Service",
+			"item": [
+				{
+					"name": "save",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"nom_service\": \"Changement de pneus bizarre\",\r\n            \"duree\": 1,\r\n            \"prix\": 60,\r\n            \"categorie_service\": \"67d721e250542fa43d9250b4\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/service/save",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"service",
+								"save"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": " {\r\n    \"_id\":\"67d9bb82d7d1670fd6f3d417\",\r\n    \"nom_service\": \"Changement de pneus de secours\",\r\n    \"duree\": 1,\r\n    \"prix\": 60,\r\n    \"categorie_service\": \"67d721e250542fa43d9250b4\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/service/update",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"service",
+								"update"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/service/67d9bb82d7d1670fd6f3d417",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"service",
+								"67d9bb82d7d1670fd6f3d417"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "read",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/service/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"service",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "readBy",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"nom_service\": \"Changement de pneus arrière\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/service/search/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"service",
+								"search",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "readById",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/service/id/67d721e250542fa43d9250b6",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"service",
+								"id",
+								"67d721e250542fa43d9250b6"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Voiture",
+			"item": [
+				{
+					"name": "save",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{  \"immatriculation\": \"ABC1002\",\r\n        \"kilometrage\": 92420,\r\n        \"marque\": \"Toyota\",\r\n        \"modele\": \"Corolla\",\r\n        \"client\": \"67d722a4635cf6fcd5e256f8\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/voiture/save",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"voiture",
+								"save"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": " {\r\n    \"_id\":\"67d9bb82d7d1670fd6f3d417\",\r\n    \"nom_service\": \"Changement de pneus de secours\",\r\n    \"duree\": 1,\r\n    \"prix\": 60,\r\n    \"categorie_service\": \"67d721e250542fa43d9250b4\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/voiture/update",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"voiture",
+								"update"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/voiture/67d9bb82d7d1670fd6f3d417",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"voiture",
+								"67d9bb82d7d1670fd6f3d417"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "read",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/voiture/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"voiture",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "readBy",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"nom_service\": \"Changement de pneus arrière\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/voiture/search/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"voiture",
+								"search",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "readById",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/voiture/id/67d9cbb1dbdbbbafdf689cde",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"voiture",
+								"id",
+								"67d9cbb1dbdbbbafdf689cde"
+							]
+						}
 					},
 					"response": []
 				}
@@ -112,7 +990,7 @@
 		},
 		{
 			"key": "token",
-			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2Q4NWNkYTZkODJmOTZhMGRjYWE4ZjQiLCJ1c2VybmFtZSI6Im5vbTEgSm9lbCIsInJvbGUiOiJDbGllbnQiLCJlbWFpbCI6Im15X2VtYWlsQGdtYWlsLmNvbSIsImlhdCI6MTc0MjIzNjIxNywiZXhwIjoxNzQyMjM2ODE3fQ.cfKDKIqWa55t-A4VCOWMjiqB4QmXwI9SAnK6wKetijQ",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2Q4NWNkYTZkODJmOTZhMGRjYWE4ZjQiLCJ1c2VybmFtZSI6Im5vbTEgSm9lbCIsInJvbGUiOiJhZG1pbiIsImVtYWlsIjoibXlfZW1haWxAZ21haWwuY29tIiwiaWF0IjoxNzQyMzE1NTI4LCJleHAiOjE3NDIzMTYxMjh9.7cL6AJS1WLed8tQUf5kCzCNjHkA9FR16_arDfi3Vj_g",
 			"type": "string"
 		}
 	]

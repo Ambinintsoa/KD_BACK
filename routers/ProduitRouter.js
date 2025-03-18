@@ -10,7 +10,7 @@ productRouter.delete("/:id",[verifyToken,RoleMiddleware.adminRole], ProduitContr
 
 productRouter.get("/:page",[verifyToken], ProduitController.read);
 productRouter.get("/search/:page",[verifyToken], ProduitController.readBy);
-productRouter.get("/:id",[verifyToken], ProduitController.readById);
+productRouter.get("/id/:id",[verifyToken], ProduitController.readById);
 
 
 module.exports = productRouter;

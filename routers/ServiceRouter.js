@@ -10,7 +10,7 @@ serviceRouter.delete("/:id",[verifyToken,RoleMiddleware.adminRole], ServiceContr
 
 serviceRouter.get("/:page",[verifyToken], ServiceController.read);
 serviceRouter.get("/search/:page",[verifyToken], ServiceController.readBy);
-serviceRouter.get("/:id",[verifyToken], ServiceController.readById);
+serviceRouter.get("/id/:id",[verifyToken], ServiceController.readById);
 
 
 module.exports = serviceRouter;

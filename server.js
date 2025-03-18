@@ -20,6 +20,7 @@ mongoose.connect(process.env.MONGO_URI, {
      .catch(err => console.log(err)); 
 
 app.use('/user',require('./routers/UtilisateurRouter'));
+app.use('/produit',require('./routers/ProduitRouter'));
 
 // Route principale
 app.get("/", (req, res) => {

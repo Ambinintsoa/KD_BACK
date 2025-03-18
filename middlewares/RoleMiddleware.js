@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-function verifyToken(req, res, next) {
+function adminRole(req,res,next){
     const token = req.header('Authorization');
 
     if (!token || !token.startsWith('Bearer ')) {
@@ -10,11 +10,13 @@ function verifyToken(req, res, next) {
         const token_without_bearer = token.split(' ')[1];
         const decoded = jwt.verify(token_without_bearer, process.env.SECRET_KEY_ACCESS);
         req.userId = decoded.userId;
-        
-        next();
+        if(decoded.role==="admin"){
+            next()
+        }else{
+             res.status(401).json({ error: 'Vous n\'avez pas la permission pour cette fonction' + error });
+        }
     } catch (error) {
         res.status(401).json({ error: 'Invalid token' + error });
     }
-};
-
-module.exports = verifyToken;
+}
+module.exports = {adminRole};

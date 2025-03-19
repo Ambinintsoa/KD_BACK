@@ -21,7 +21,7 @@ exports.save = async (serviceData) => {
 // liste de services avec pagination
 exports.read = async (offset, limit) => {
     try {
-        return await Service.find().skip(offset).limit(limit);
+        return await Service.find().skip(offset).limit(limit).populate("categorie_service");
     } catch (error) {
         console.error(error);
         throw error;
@@ -30,7 +30,7 @@ exports.read = async (offset, limit) => {
 // liste de services avec pagination et filtre => condition "et"
 exports.readBy = async (offset, limit, data) => {
     try {
-        return await Service.find(data).skip(offset).limit(limit);
+        return await Service.find(data).skip(offset).limit(limit).populate("categorie_service");
     } catch (error) {
         console.error(error);
         throw error;
@@ -39,7 +39,7 @@ exports.readBy = async (offset, limit, data) => {
 //retourne un service a partir de son id
 exports.readById = async (id) => {
     try {
-        return await Service.findOne({ _id: id });
+        return await Service.findOne({ _id: id }).populate("categorie_service");
     } catch (error) {
         console.error(error);
         throw error;

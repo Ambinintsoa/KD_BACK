@@ -73,3 +73,30 @@ exports.read=async(offset,limit)=>{
     }
 }
 
+// modifie les utilisateurs
+exports.update=async(userdata)=>{
+    try {
+        const utilisateur= new Utilisateur(userdata);
+        const initial_utilisateur = await Utilisateur.findOne({ _id:utilisateur._id });
+        if(! initial_utilisateur) throw new Error("Aucun utilisateur correspondant !");
+        
+        initial_utilisateur.nom = (utilisateur.nom && utilisateur.nom.trim()) || initial_utilisateur.nom; // Mise à jour de l'attribut
+        initial_utilisateur.prenom = (utilisateur.prenom && utilisateur.prenom.trim()) || initial_utilisateur.prenom; // Mise à jour de l'attribut
+        initial_utilisateur.email = (utilisateur.email && utilisateur.email.trim()) || initial_utilisateur.email; // Mise à jour de l'attribut
+        initial_utilisateur.adresse = (utilisateur.adresse && utilisateur.adresse.trim()) || initial_utilisateur.adresse; // Mise à jour de l'attribut
+        initial_utilisateur.contact = (utilisateur.contact && utilisateur.contact.trim()) || initial_utilisateur.contact; // Mise à jour de l'attribut
+        initial_utilisateur.role = (utilisateur.role && utilisateur.role.trim()) || initial_utilisateur.role; // Mise à jour de l'attribut
+        initial_utilisateur.poste = (utilisateur.poste && utilisateur.poste.trim()) || initial_utilisateur.poste; // Mise à jour de l'attribut
+        initial_utilisateur.genre = (utilisateur.genre && utilisateur.genre.trim()) || initial_utilisateur.genre; // Mise à jour de l'attribut
+        initial_utilisateur.date_de_naissance = utilisateur.date_de_naissance || initial_utilisateur.date_de_naissance; // Mise à jour de l'attribut
+        initial_utilisateur.salaire = utilisateur.salaire || initial_utilisateur.salaire; // Mise à jour de l'attribut
+        initial_utilisateur.image = (utilisateur.image && utilisateur.image.trim()) || initial_utilisateur.image; // Mise à jour de l'attribut
+        
+        
+        await initial_utilisateur.save(); // Sauvegarde les modifications
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
+

@@ -1,0 +1,78 @@
+const Service = require('../models/Service');
+
+// enregistre un service
+exports.save = async (serviceData) => {
+    try {
+        const service = new Service(serviceData);
+        if (!service.nom_service || !service.categorie_service) throw new Error("Le nom du service et la catégorie du service sont obligatoires !");
+
+        if (await Service.countDocuments({ nom_service: service.nom_service.trim() }) < 1) {
+            service.nom_service = service.nom_service.trim();
+            await service.save();
+        }else{
+            throw new Error("Il y a déjà un service portant ce nom");
+        }
+        
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
+// liste de services avec pagination
+exports.read = async (offset,limit) => {
+    try {
+        return await Service.find().skip(offset).limit(limit);
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
+// liste de services avec pagination et filtre => condition "et"
+exports.readBy = async (offset,limit,data) => {
+    try {
+        return await Service.find(data).skip(offset).limit(limit);
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
+//retourne un service a partir de son id
+exports.readById = async (id) => {
+    try {
+        return await Service.findOne({_id:id});
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
+
+// modifie les données Obliger d'avoir _id
+exports.update = async(data)=>{
+    try {
+        const service = new Service(data);
+        console.log(service.nom_service);
+        const initial_service = await Service.findOne({ _id:service._id });
+        
+        if(! initial_service) throw new Error("Aucun service correspondant !");
+       
+        initial_service.nom_service =service.nom_service || ''; // Mise à jour de l'attribut
+        initial_service.duree=service.duree || 0;
+        initial_service.prix=service.prix || 0;
+        initial_service.categorie_service=service.categorie_service;
+
+        await initial_service.save(); // Sauvegarde les modifications
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
+//supprime un service a partir de l'id
+exports.delete=async(id)=>{
+    try {
+        const serviceSupprime = await Service.findByIdAndDelete(id);
+        console.log(serviceSupprime); // Affiche le service supprimé
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}

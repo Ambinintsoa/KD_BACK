@@ -7,7 +7,9 @@ exports.saveUser = async (userData) => {
     try {
         const user = new Utilisateur(userData);
         if (!user.email || !user.mot_de_passe) throw new Error("Email et mot de passe sont obligatoires !");
-
+        if(user.salaire && user.salaire<0){
+            throw new Error("Le salaire doit être positif !");
+        }
         let email = user.email.trim();
         if (! await Utilisateur.findOne({ email })) {
             user.mot_de_passe = await bcrypt.hash(user.mot_de_passe.trim(), 10);
@@ -79,6 +81,10 @@ exports.update=async(userdata)=>{
         const utilisateur= new Utilisateur(userdata);
         const initial_utilisateur = await Utilisateur.findOne({ _id:utilisateur._id });
         if(! initial_utilisateur) throw new Error("Aucun utilisateur correspondant !");
+
+        if(utilisateur.salaire && utilisateur.salaire<0){
+             throw new Error("Le salaire doit être positif !");
+        }
         
         initial_utilisateur.nom = (utilisateur.nom && utilisateur.nom.trim()) || initial_utilisateur.nom; // Mise à jour de l'attribut
         initial_utilisateur.prenom = (utilisateur.prenom && utilisateur.prenom.trim()) || initial_utilisateur.prenom; // Mise à jour de l'attribut

@@ -9,17 +9,17 @@ exports.save = async (serviceData) => {
         if (await Service.countDocuments({ nom_service: service.nom_service.trim() }) < 1) {
             service.nom_service = service.nom_service.trim();
             await service.save();
-        }else{
+        } else {
             throw new Error("Il y a déjà un service portant ce nom");
         }
-        
+
     } catch (error) {
         console.error(error);
         throw error;
     }
 }
 // liste de services avec pagination
-exports.read = async (offset,limit) => {
+exports.read = async (offset, limit) => {
     try {
         return await Service.find().skip(offset).limit(limit);
     } catch (error) {
@@ -28,7 +28,7 @@ exports.read = async (offset,limit) => {
     }
 }
 // liste de services avec pagination et filtre => condition "et"
-exports.readBy = async (offset,limit,data) => {
+exports.readBy = async (offset, limit, data) => {
     try {
         return await Service.find(data).skip(offset).limit(limit);
     } catch (error) {
@@ -39,7 +39,7 @@ exports.readBy = async (offset,limit,data) => {
 //retourne un service a partir de son id
 exports.readById = async (id) => {
     try {
-        return await Service.findOne({_id:id});
+        return await Service.findOne({ _id: id });
     } catch (error) {
         console.error(error);
         throw error;
@@ -47,18 +47,21 @@ exports.readById = async (id) => {
 }
 
 // modifie les données Obliger d'avoir _id
-exports.update = async(data)=>{
+exports.update = async (data) => {
     try {
         const service = new Service(data);
         console.log(service.nom_service);
-        const initial_service = await Service.findOne({ _id:service._id });
+        const initial_service = await Service.findOne({ _id: service._id });
+
+        if (!initial_service) throw new Error("Aucun service correspondant !");
         
-        if(! initial_service) throw new Error("Aucun service correspondant !");
-       
-        initial_service.nom_service =service.nom_service || ''; // Mise à jour de l'attribut
-        initial_service.duree=service.duree || 0;
-        initial_service.prix=service.prix || 0;
-        initial_service.categorie_service=service.categorie_service;
+        if (service.prix && service.prix < 0) throw new Error("Le prix doit avoir une valeur positive !");
+        
+        initial_service.nom_service = (service.nom_service && service.nom_service.trim()) || ''; // Mise à jour de l'attribut
+        initial_service.duree = (service.duree || service.duree === 0) ? service.duree : 0; // Mise à jour de l'attribut
+        initial_service.prix = (service.prix || service.prix === 0) ? service.prix : 0; // Mise à jour de l'attribut
+        initial_service.categorie_service = service.categorie_service || initial_service.categorie_service; // Mise à jour de l'attribut
+
 
         await initial_service.save(); // Sauvegarde les modifications
     } catch (error) {
@@ -67,7 +70,7 @@ exports.update = async(data)=>{
     }
 }
 //supprime un service a partir de l'id
-exports.delete=async(id)=>{
+exports.delete = async (id) => {
     try {
         const serviceSupprime = await Service.findByIdAndDelete(id);
         console.log(serviceSupprime); // Affiche le service supprimé

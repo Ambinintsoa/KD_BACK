@@ -53,7 +53,8 @@ exports.update = async(data)=>{
         const initial_categorie = await CategorieService.findOne({ _id:categorie._id });
         if(! initial_categorie) throw new Error("Aucun categorie correspondant !");
 
-        initial_categorie.nom_categorie = categorie.nom_categorie.trim(); // Mise à jour de l'attribut
+        initial_categorie.nom_categorie = (categorie.nom_categorie && categorie.nom_categorie.trim()) || ''; // Mise à jour de l'attribut
+
        
         await initial_categorie.save(); // Sauvegarde les modifications
     } catch (error) {

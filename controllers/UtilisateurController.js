@@ -43,6 +43,19 @@ exports.read= async (req,res)=>{
     }
 }
 
+//modifie les données  de l'utilisateur
+exports.update=async (req,res)=>{
+    try {
+       
+        await userService.update(req.body);
+        res.status(201).json({ message: "Utilisateur modifié avec succès" });
+        
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: error.message });
+    }
+}
+
 exports.refreshToken=async (req,res)=>{
     const refreshToken = req.cookies.refresh_token;
   if (!refreshToken) {

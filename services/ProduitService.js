@@ -54,8 +54,9 @@ exports.update = async(data)=>{
         const initial_produit = await Produit.findOne({ _id:produit._id });
         if(! initial_produit) throw new Error("Aucun produit correspondant !");
         
-        initial_produit.nom_produit =produit.nom_produit.trim(); // Mise à jour de l'attribut
-        initial_produit.unite=produit.unite.trim();
+        initial_produit.nom_produit = (produit.nom_produit && produit.nom_produit.trim()) || initial_produit.nom_produit; // Mise à jour de l'attribut
+        initial_produit.unite = (produit.unite && produit.unite.trim()) || initial_produit.unite; // Mise à jour de l'attribut
+        
         await initial_produit.save(); // Sauvegarde les modifications
     } catch (error) {
         console.error(error);

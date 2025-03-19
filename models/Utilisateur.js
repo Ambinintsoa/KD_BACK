@@ -11,7 +11,8 @@ const UtilisateurSchema = new mongoose.Schema({
   poste: { type: String, required: false },
   genre: { type: String, required: true },
   date_de_naissance: { type: Date, required: true },
-  salaire: { type: Number, required: false }
+  salaire: { type: Number, required: false },
+  image:{type:String,required:false}
 
 }, {
   timestamps: true

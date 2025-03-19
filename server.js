@@ -25,6 +25,7 @@ app.use('/categorie',require('./routers/CategorieRouter'));
 app.use('/service',require('./routers/ServiceRouter'));
 app.use('/voiture',require('./routers/VoitureRouter'));
 app.use('/usageproduitservice',require('./routers/UsageProduitServiceRouter'));
+app.use('/fournisseur',require('./routers/FournisseurRouter'));
 
 // Route principale
 app.get("/", (req, res) => {

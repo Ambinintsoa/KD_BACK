@@ -6,6 +6,7 @@ exports.save = async (voitureData) => {
         const voiture = new Voiture(voitureData);
         if (!voiture.immatriculation || !voiture.marque || !voiture.modele || !voiture.client) throw new Error("Le numero d'immatriculation,la marque et modèle de la voiture sont obligatoires !");
 
+
         if (await Voiture.countDocuments({ immatriculation: voiture.immatriculation.trim() }) < 1) {
             voiture.immatriculation = voiture.immatriculation.trim();
             voiture.marque = voiture.marque.trim();
@@ -24,7 +25,7 @@ exports.save = async (voitureData) => {
 // liste de voitures avec pagination
 exports.read = async (offset, limit) => {
     try {
-        return await Voiture.find().skip(offset).limit(limit);
+        return await Voiture.find().skip(offset).limit(limit).populate("client");
     } catch (error) {
         console.error(error);
         throw error;
@@ -33,7 +34,7 @@ exports.read = async (offset, limit) => {
 // liste de voitures avec pagination et filtre => condition "et"
 exports.readBy = async (offset, limit, data) => {
     try {
-        return await Voiture.find(data).skip(offset).limit(limit);
+        return await Voiture.find(data).skip(offset).limit(limit).populate("client");
     } catch (error) {
         console.error(error);
         throw error;
@@ -42,7 +43,7 @@ exports.readBy = async (offset, limit, data) => {
 //retourne un voiture a partir de son id
 exports.readById = async (id) => {
     try {
-        return await Voiture.findOne({ _id: id });
+        return await Voiture.findOne({ _id: id }).populate("client");
     } catch (error) {
         console.error(error);
         throw error;

@@ -1,5 +1,4 @@
 const AvisClientService=require("../services/AvisClientService");
-
 exports.save = async(req,res)=>{
     try {
         await AvisClientService.save(req.body);
@@ -65,6 +64,29 @@ exports.delete = async(req,res)=>{
     try {
         await AvisClientService.delete(req.params.id);
         res.status(200).json({ message: " L' Avis Client effacé avec succès" });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: error.message });
+    }
+}
+// modifie le statut
+exports.updateStatut = async(req,res)=>{
+    try {
+        await AvisClientService.updateStatut(req.params.id,req.params.statut);
+        res.status(200).json({ message: " Le statut de l' Avis Client est modifié avec succès" });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: error.message });
+    }
+}
+
+exports.readByRandom = async(req,res)=>{
+    try {
+        let limit=req.params.limit;
+        const resultat=await AvisClientService.readRandom(limit);
+        res.status(200).json({ avis_clients: resultat });
 
     } catch (error) {
         console.error(error);

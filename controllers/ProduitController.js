@@ -9,19 +9,27 @@ exports.save = async(req,res)=>{
         res.status(500).json({ error: error.message });
     }
 }
-exports.read = async(req,res)=>{
-    try {
-        let page=req.params.page || 1;
-        let limit=10;
-        const offset = (page - 1) * limit;
-        let produits=await ProduitService.read(offset,limit);
 
-        res.status(200).json({ produits:produits });
+exports.read = async (req, res) => {
+    try {
+        
+        let page = parseInt(req.query.page) || 1;
+        let limit = parseInt(req.query.limit) || 10;
+        let search = req.query.search || ''; 
+        let sortBy = req.query.sortBy || 'nom_produit'; 
+        let sortOrder = req.query.orderBy; 
+        let { produits, total } = await ProduitService.read(page, limit, search, sortBy, sortOrder);
+        res.status(200).json({ 
+            produits,
+            currentPage: page,
+            totalPages: Math.ceil(total / limit),
+            totalItems: total,
+        });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: error.message });
     }
-}
+};
 
 exports.readBy = async(req,res)=>{
     try {

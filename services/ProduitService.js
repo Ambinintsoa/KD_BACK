@@ -20,14 +20,30 @@ exports.save = async (produitData) => {
     }
 }
 // liste de produits avec pagination
-exports.read = async (offset,limit) => {
+exports.read = async (page, limit, search, sortBy, sortOrder) => {
     try {
-        return await Produit.find().skip(offset).limit(limit);
+        const query = search
+            ? { nom_produit: { $regex: search, $options: "i" } } // Recherche insensible à la casse
+            : {};
+
+        const sortOption = {};
+        sortOption[sortBy] = sortOrder === "desc" ? -1 : 1; // Tri ascendant ou descendant
+        if (page < 1) {
+            page = 1;
+        }
+        const produits = await Produit.find(query)
+        .collation({ locale: 'fr', strength: 2 })
+            .sort(sortOption)
+            .skip((page - 1) * limit)
+            .limit(limit);
+        const total = await Produit.countDocuments(query);
+
+        return { produits, total };
     } catch (error) {
-        console.error(error);
-        throw error;
+        console.log(error.message)
+        throw new Error("Erreur lors de la récupération des catégories");
     }
-}
+};
 // liste de produits avec pagination et filtre => condition "et"
 exports.readBy = async (offset,limit,data) => {
     try {

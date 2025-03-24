@@ -18,6 +18,25 @@ exports.save = async (categorieData) => {
         throw error;
     }
 }
+// liste de categories 
+exports.getAll = async (query = {}, sortOption = { nom_categorie: 1 }) => {
+    try {
+        // Récupération des catégories avec collation, tri par nom_categorie croissant (ASC)
+        const categories = await CategorieService.find(query)
+            .collation({ locale: 'fr', strength: 2 })
+            .sort(sortOption); // Tri par nom_categorie ascendant
+
+        // Comptage des documents (total)
+        const total = await CategorieService.countDocuments(query);
+
+        // Retourner les catégories et le total
+        return { categories, total };
+    } catch (error) {
+        console.error("Erreur lors de la récupération des catégories : ", error.message);
+        throw new Error("Erreur lors de la récupération des catégories");
+    }
+};
+
 // liste de categories avec pagination
 exports.read = async (page, limit, search, sortBy, sortOrder) => {
     try {

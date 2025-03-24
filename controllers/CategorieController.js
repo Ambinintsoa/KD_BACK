@@ -31,6 +31,19 @@ exports.read = async (req, res) => {
     }
 };
 
+exports.getAll = async (req, res) => {
+    try {
+        
+        let { categories, total } = await CategorieService.getAll();
+        res.status(200).json({ 
+            categories,
+            totalItems: total,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: error.message });
+    }
+};
 
 exports.readBy = async(req,res)=>{
     try {

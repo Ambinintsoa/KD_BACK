@@ -9,6 +9,7 @@ categoryRouter.put("/update",[verifyToken,RoleMiddleware.adminRole], CategorieCo
 categoryRouter.delete("/:id",[verifyToken,RoleMiddleware.adminRole], CategorieController.delete);
 
 categoryRouter.get("",[verifyToken], CategorieController.read);
+categoryRouter.get("/getAll",[verifyToken], CategorieController.getAll);
 categoryRouter.get("/search/:page",[verifyToken], CategorieController.readBy);
 categoryRouter.get("/id/:id",[verifyToken], CategorieController.readById);
 

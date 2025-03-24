@@ -1,5 +1,5 @@
 const CategorieService = require('../models/CategorieService');
-
+const { Op } = require('sequelize');
 // enregistre une categorie
 exports.save = async (categorieData) => {
     try {
@@ -19,14 +19,30 @@ exports.save = async (categorieData) => {
     }
 }
 // liste de categories avec pagination
-exports.read = async (offset,limit) => {
+exports.read = async (page, limit, search, sortBy, sortOrder) => {
     try {
-        return await CategorieService.find().skip(offset).limit(limit);
+        const query = search
+            ? { nom_categorie: { $regex: search, $options: "i" } } // Recherche insensible à la casse
+            : {};
+
+        const sortOption = {};
+        sortOption[sortBy] = sortOrder === "desc" ? -1 : 1; // Tri ascendant ou descendant
+        if (page < 1) {
+            page = 1;
+        }
+        const categories = await CategorieService.find(query)
+        .collation({ locale: 'fr', strength: 2 })
+            .sort(sortOption)
+            .skip((page - 1) * limit)
+            .limit(limit);
+        const total = await CategorieService.countDocuments(query);
+
+        return { categories, total };
     } catch (error) {
-        console.error(error);
-        throw error;
+        console.log(error.message)
+        throw new Error("Erreur lors de la récupération des catégories");
     }
-}
+};
 // liste de categories avec pagination et filtre => condition "et"
 exports.readBy = async (offset,limit,data) => {
     try {
@@ -52,10 +68,8 @@ exports.update = async(data)=>{
         const categorie = new CategorieService(data);
         const initial_categorie = await CategorieService.findOne({ _id:categorie._id });
         if(! initial_categorie) throw new Error("Aucun categorie correspondant !");
-
         initial_categorie.nom_categorie = (categorie.nom_categorie && categorie.nom_categorie.trim()) || initial_categorie.nom_categorie; // Mise à jour de l'attribut
 
-       
         await initial_categorie.save(); // Sauvegarde les modifications
     } catch (error) {
         console.error(error);
@@ -72,3 +86,16 @@ exports.delete=async(id)=>{
         throw error;
     }
 }
+//supprime une categorie a partir d'un tableau d'ids
+exports.delete = async (ids) => { 
+    try {
+        const categorieSupprime = await CategorieService.deleteMany({
+            _id: { $in: ids } // Utilise $in pour correspondre à plusieurs IDs
+        });
+        console.log(categorieSupprime); // Affiche le résultat de la suppression
+        return categorieSupprime; 
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};

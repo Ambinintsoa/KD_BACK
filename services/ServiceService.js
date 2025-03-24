@@ -1,5 +1,5 @@
 const Service = require('../models/Service');
-
+const { Op } = require('sequelize');
 // enregistre un service
 exports.save = async (serviceData) => {
     try {
@@ -19,14 +19,30 @@ exports.save = async (serviceData) => {
     }
 }
 // liste de services avec pagination
-exports.read = async (offset, limit) => {
+exports.read = async (page, limit, search, sortBy, sortOrder) => {
     try {
-        return await Service.find().skip(offset).limit(limit);
+        const query = search
+            ? { nom_service: { $regex: search, $options: "i" } } // Recherche insensible à la casse
+            : {};
+
+        const sortOption = {};
+        sortOption[sortBy] = sortOrder === "desc" ? -1 : 1; // Tri ascendant ou descendant
+        if (page < 1) {
+            page = 1;
+        }
+        const services = await Service.find(query)
+        .collation({ locale: 'fr', strength: 2 })
+            .sort(sortOption)
+            .skip((page - 1) * limit)
+            .limit(limit);
+        const total = await Service.countDocuments(query);
+
+        return { services, total };
     } catch (error) {
-        console.error(error);
-        throw error;
+        console.log(error.message)
+        throw new Error("Erreur lors de la récupération des services");
     }
-}
+};
 // liste de services avec pagination et filtre => condition "et"
 exports.readBy = async (offset, limit, data) => {
     try {

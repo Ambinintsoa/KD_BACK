@@ -27,6 +27,7 @@ app.use('/voiture',require('./routers/VoitureRouter'));
 app.use('/usageproduitservice',require('./routers/UsageProduitServiceRouter'));
 app.use('/fournisseur',require('./routers/FournisseurRouter'));
 app.use('/avisclient',require('./routers/AvisClientRouter'));
+app.use('/rendezvous',require('./routers/RDVRouter'));
 
 // Route principale
 app.get("/", (req, res) => {

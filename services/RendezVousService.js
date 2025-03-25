@@ -130,7 +130,7 @@ exports.saveRDV = async (req) => {
 };
 
 
-// Fonction pour sauvegarder le rendez-vous et les tâches associées
+// Fonction pour assigner le rendez-vous a un mecanicien
 exports.assignRDV = async (data) => {
     const error_field = [];
     const session = await mongoose.startSession();  // Démarrer une session
@@ -139,14 +139,25 @@ exports.assignRDV = async (data) => {
 
     try {
         // Enregistrer le rendez-vous dans la session
+        if (!mongoose.Types.ObjectId.isValid(data.rdv)) {
+                error_field.push({ field: `rendezvous`, message: `Le rendez vous est invalide` });
+        }
+        if (!mongoose.Types.ObjectId.isValid(data.mecanicien)) {
+            error_field.push({ field: `mecanicien`, message: `Le mecanicien est invalide` });
+        }
+        if (error_field.length > 0) {
+            throw { message: "Validation failed", errors: error_field };
+        }
+        //verifie s'il y a un rdv portant ce id
         const initial_rdv = await RendezVous.findOne({ _id: data.rdv });
         if(!initial_rdv){
             error_field.push({ field: `rendezvous`, message: `Le rendez vous est invalide` });
         }
-
+        //verifie s'il y a un mecanicien portant ce id
         if (! await Utilisateur.findOne({ _id: data.mecanicien })) {
             error_field.push({ field: `mecanicien`, message: `Le mecanicien est invalide` });
         }else{
+            //modifie le rdv : statut => assigné et nouveau ,mecanicien
             initial_rdv.mecanicien = data.mecanicien;
             initial_rdv.statut = "Assigné";
             await initial_rdv.save({session});

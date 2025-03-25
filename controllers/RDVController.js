@@ -18,3 +18,21 @@ exports.saveRDV = async (req, res) => {
         res.status(500).json({ message: "Une erreur interne est survenue" })
     }
 };
+
+exports.assignRDV = async (req, res) => {
+
+    try {
+        await RendezVousService.assignRDV(req.body);
+        
+        res.status(201).json({ message: "Assignation réussie" });
+    } catch (error) {
+       
+        console.error(error);
+        if (error.errors) {
+            // Renvoyer les erreurs de validation
+            return res.status(400).json({ message: error.message, errors: error.errors });
+        }
+        // Renvoyer une erreur générique
+        res.status(500).json({ message: "Une erreur interne est survenue" })
+    }
+};

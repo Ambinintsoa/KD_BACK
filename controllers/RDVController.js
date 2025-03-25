@@ -10,6 +10,11 @@ exports.saveRDV = async (req, res) => {
     } catch (error) {
        
         console.error(error);
-        res.status(500).json({ error: error.message });
+        if (error.errors) {
+            // Renvoyer les erreurs de validation
+            return res.status(400).json({ message: error.message, errors: error.errors });
+        }
+        // Renvoyer une erreur générique
+        res.status(500).json({ message: "Une erreur interne est survenue" })
     }
 };

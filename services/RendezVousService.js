@@ -31,11 +31,11 @@ exports.save = async (rdv_data, objet_session) => {
             }
         }
 
-        // Vérification des doublons
-        const existingRdv = await RendezVous.findOne({ client: rdv.client, date_heure_debut: rdv.date_heure_debut });
-        if (existingRdv) {
-            error_field.push({ field: "rendezvous", message: "Rendez-vous déjà enregistré !" });
-        }
+        // // Vérification des doublons
+        // const existingRdv = await RendezVous.findOne({ client: rdv.client, date_heure_debut: rdv.date_heure_debut });
+        // if (existingRdv) {
+        //     error_field.push({ field: "rendezvous", message: "Rendez-vous déjà enregistré !" });
+        // }
 
         // Si la liste d'erreurs contient des erreurs, on les renvoie
         if (error_field.length > 0) {
@@ -77,34 +77,47 @@ exports.saveRDV = async (req) => {
     try {
         // Enregistrer le rendez-vous dans la session
         const last_rdv = await exports.save(otherData, { session });
+        let error_field = []; // Assurez-vous que error_field est défini
         let i = 1;
 
         // Créer des objets de tâches à insérer
-        const taches_obj = taches.map(async tacheData => {
-            if (!mongoose.Types.ObjectId.isValid(tacheData.service)) {
-                console.log("L'ID du service n'est pas valide.");
-                error_field.push({ field: `service${i}`, message: `L'ID du service numero ${i} n'est pas valide.` });
-
-            } else {
-                const service = await Service.findOne({ _id: mongoose.Types.ObjectId(tacheData.service) });
-                if (!service) {
-                    error_field.push({ field: `service${i}`, message: `Le service numero ${i} est invalide` });
+        const taches_obj = await Promise.all(
+            taches.map(async (tacheData) => {
+                if (!mongoose.Types.ObjectId.isValid(tacheData.service)) {
+                    error_field.push({
+                        field: `service${i}`,
+                        message: `L'ID du service numéro ${i} n'est pas valide.`,
+                    });
+                } else {
+                    const service = await Service.findOne({
+                        _id: new mongoose.Types.ObjectId(tacheData.service),
+                    });
+                    if (!service) {
+                        error_field.push({
+                            field: `service${i}`,
+                            message: `Le service numéro ${i} est invalide.`,
+                        });
+                    }
                 }
-            }
-            i = i + 1;
 
-        });
+                const temp_tache = new Tache(tacheData);
+                temp_tache.rendez_vous = last_rdv._id;
+                i++; // Incrémenter l'indice après traitement
 
+                return temp_tache;
+            })
+        );
+
+        // Si des erreurs ont été détectées, lever une exception avant de continuer
         if (error_field.length > 0) {
             throw { message: "Validation failed", errors: error_field };
         }
-        // Sauvegarder toutes les tâches en parallèle dans la session
+
+        // Sauvegarder toutes les tâches en parallèle dans la
         await Promise.all(
-            taches_obj.map(tache => tache.save({ session }))  // Sauvegarde chaque tâche dans la session
+            taches_obj.map((tache) => tache.save({ session })) // Sauvegarde chaque tâche dans la session
         );
 
-
-        // Si tout s'est bien passé, on commite la transaction
         await session.commitTransaction();
 
         // Terminer la session
@@ -140,7 +153,7 @@ exports.assignRDV = async (data) => {
     try {
         // Enregistrer le rendez-vous dans la session
         if (!mongoose.Types.ObjectId.isValid(data.rdv)) {
-                error_field.push({ field: `rendezvous`, message: `Le rendez vous est invalide` });
+            error_field.push({ field: `rendezvous`, message: `Le rendez vous est invalide` });
         }
         if (!mongoose.Types.ObjectId.isValid(data.mecanicien)) {
             error_field.push({ field: `mecanicien`, message: `Le mecanicien est invalide` });
@@ -150,19 +163,19 @@ exports.assignRDV = async (data) => {
         }
         //verifie s'il y a un rdv portant ce id
         const initial_rdv = await RendezVous.findOne({ _id: data.rdv });
-        if(!initial_rdv){
+        if (!initial_rdv) {
             error_field.push({ field: `rendezvous`, message: `Le rendez vous est invalide` });
         }
         //verifie s'il y a un mecanicien portant ce id
         if (! await Utilisateur.findOne({ _id: data.mecanicien })) {
             error_field.push({ field: `mecanicien`, message: `Le mecanicien est invalide` });
-        }else{
+        } else {
             //modifie le rdv : statut => assigné et nouveau ,mecanicien
             initial_rdv.mecanicien = data.mecanicien;
             initial_rdv.statut = "Assigné";
-            await initial_rdv.save({session});
+            await initial_rdv.save({ session });
         }
-    
+
         if (error_field.length > 0) {
             throw { message: "Validation failed", errors: error_field };
         }
@@ -191,3 +204,71 @@ exports.assignRDV = async (data) => {
 
     }
 };
+// liste de tous les rendez-vous
+exports.read = async (offset, limit) => {
+    try {
+        return await RendezVous.find().
+                    skip(offset).
+                    limit(limit).
+                    populate("client").
+                    populate("mecanicien").
+                    populate("voiture");
+    } catch (error) {
+        console.error(error);
+        throw error;
+
+    }
+}
+// liste de tous les rendez-vous par mecanicien entre deux dates
+exports.readByMecanicien = async (offset, limit, data) => {
+    try {
+        // console.log(new Date(data.date_debut),new Date(data.date_fin));
+        if (!data.date_debut) {
+            data.date_debut = new Date();
+        }
+        if (!data.date_fin) {
+            let temp_date = new Date(data.date_debut); 
+            temp_date.setDate(temp_date.getDate() + 7); // Ajoute 7 jour
+            data.date_fin = temp_date;
+        }
+        // Construire la condition de recherche
+        const searchConditions = {
+            mecanicien: data.mecanicien,
+            date_heure_debut: { 
+                $gte: new Date(data.date_debut), // Début de la plage
+                $lte: new Date(data.date_fin)   // Fin de la plage
+            },
+        };  
+        
+        return await RendezVous.find(searchConditions).
+                    skip(offset).
+                    limit(limit).
+                    populate("client").
+                    populate("mecanicien").
+                    populate("voiture");
+    } catch (error) {
+        console.error(error);
+        throw error;
+
+    }
+}
+// liste de tous les rendez-vous par mecanicien entre deux dates
+exports.readByStatus = async (offset, limit,data) => {
+    try {
+        // Construire la condition de recherche
+        const searchConditions = {
+            statut:data.s
+        };
+        console.log(data);
+        return await RendezVous.find(searchConditions).
+                    skip(offset).
+                    limit(limit).
+                    populate("client").
+                    populate("mecanicien").
+                    populate("voiture");
+    } catch (error) {
+        console.error(error);
+        throw error;
+
+    }
+}

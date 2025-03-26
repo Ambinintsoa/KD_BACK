@@ -8,6 +8,7 @@ const RendezVousSchema = new mongoose.Schema({
     voiture: { type: mongoose.Schema.Types.ObjectId, ref: "Voiture", required: false },
     montant_total: { type: Number, required: false },
     statut: { type: String, required: true,default:"Non Assigné"}, // En cours; terminer
+    etat:{type:Number,required:true,default:0} //0 : pas encore terminé ; 1 terminé
 }, {
     timestamps: true // Option de timestamp pour createdAt et updatedAt
 });

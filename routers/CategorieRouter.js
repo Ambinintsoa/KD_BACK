@@ -6,7 +6,7 @@ const RoleMiddleware = require('../middlewares/RoleMiddleware');
 
 categoryRouter.post("/save",[verifyToken,RoleMiddleware.adminRole], CategorieController.save);
 categoryRouter.put("/update",[verifyToken,RoleMiddleware.adminRole], CategorieController.update);
-categoryRouter.delete("/:id",[verifyToken,RoleMiddleware.adminRole], CategorieController.delete);
+categoryRouter.delete("",[verifyToken,RoleMiddleware.adminRole], CategorieController.delete);
 
 categoryRouter.get("",[verifyToken], CategorieController.read);
 categoryRouter.get("/getAll",[verifyToken], CategorieController.getAll);

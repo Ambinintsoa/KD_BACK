@@ -1,7 +1,25 @@
 const ProduitService= require("../services/ProduitService");
-
+const Produit = require("../models/Produit")
 exports.save = async(req,res)=>{
     try {
+        const produitData = req.body;
+        if (!produitData.nom_produit) {
+            return res.status(400).json({
+                field: "nom_produit",
+                message: "Le nom du produit est obligatoire !"
+            });
+        }
+          const existingCategorieCount = await ProduitService.countDocuments({
+                    nom_produit: produitData.nom_produit.trim()
+                });
+        
+                if (existingCategorieCount > 0) {
+                    return res.status(400).json({
+                        field: "nom_produit",
+                        message: "Il y a déjà un produit portant ce nom"
+                    });
+                }
+        
         await ProduitService.save(req.body);
         res.status(201).json({ message: "Insertion réussie" });
     } catch (error) {
@@ -58,6 +76,19 @@ exports.readById = async(req,res)=>{
 
 exports.update = async(req,res)=>{
     try {
+        const produitData = req.body;
+           const existingProduit = await Produit.findOne({
+                    nom_produit: produitData.nom_produit.trim(),
+                    _id: { $ne: produitData._id }
+                  });
+                  
+                if (existingProduit) {
+                    return res.status(400).json({
+                        field: "nom_produit",
+                        message: "Il y a déjà un produit portant ce nom"
+                    });
+                }
+        
         await ProduitService.update(req.body);
         res.status(200).json({ message: "Produit modifié avec succès" });
 
@@ -66,15 +97,40 @@ exports.update = async(req,res)=>{
         res.status(500).json({ error: error.message });
     }
 }
-exports.delete = async(req,res)=>{
+exports.delete = async (req, res) => {
     try {
-        await ProduitService.delete(req.params.id);
-        res.status(200).json({ message: " Produit effacé avec succès" });
+        const ids = req.body;  // Récupère les IDs depuis le corps de la requête
+        
+        // Vérifie que les IDs sont bien fournis et valides
+        if (!ids || !Array.isArray(ids) || ids.length === 0) {
+            return res.status(400).json({ error: "Aucun id fourni ou le format est incorrect." });
+        }
 
+        let deletionResults = [];  // Tableau pour stocker les résultats de suppression
+        
+        // Parcours chaque ID pour vérifier s'il est utilisé et effectuer la suppression
+        for (const id of ids) {
+            // Vérifie si la catégorie est utilisée dans une autre collection
+
+            // Effectue la suppression de la catégorie
+          await ProduitService.update({ _id: id, statut: 1 });
+
+                deletionResults.push({
+                    id,
+                    message: 'Produit supprimé avec succès'
+                });
+        }
+
+        // Renvoie le tableau de résultats de la suppression
+        return res.status(200).json({ results: deletionResults });
+        
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: "Une erreur est survenue lors de la suppression des produits", details: error.message });
     }
-}
+};
+
+
+
 
 

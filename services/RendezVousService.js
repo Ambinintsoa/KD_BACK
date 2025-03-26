@@ -240,7 +240,7 @@ exports.readByMecanicien = async (offset, limit, data) => {
             },
         };  
         
-        return await RendezVous.find(searchConditions).
+        return await RendezVous.find(searchConditions).sort({date_heure_debut:1}).
                     skip(offset).
                     limit(limit).
                     populate("client").
@@ -257,7 +257,7 @@ exports.readByStatus = async (offset, limit,data) => {
     try {
         // Construire la condition de recherche
         const searchConditions = {
-            statut:data.s
+            statut:data.statut
         };
         console.log(data);
         return await RendezVous.find(searchConditions).

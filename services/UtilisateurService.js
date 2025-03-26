@@ -105,4 +105,12 @@ exports.update=async(userdata)=>{
         throw error;
     }
 }
+exports.getMecanicienDisponible=async(offset,limit)=>{
+    try {
+        return User.find({role:"mecanicien"}).join("rendezvous").where("rendezvous.etat=1").skip(offset).limit(limit);
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
 

@@ -11,8 +11,8 @@ rdv_Router.post("/assign",[verifyToken,RoleMiddleware.managerRole], RDVControlle
 rdv_Router.get("/:page",[verifyToken], RDVController.read);
 rdv_Router.get("/mecanicien_rdv/:page",[verifyToken], RDVController.readByMecanicien);
 rdv_Router.get("/statut/:page",[verifyToken], RDVController.readByStatus);
-
-// rdv_Router.get("/id/:id",[verifyToken], RDVController.readById);
+//mecanicien disponible
+rdv_Router.get("/mecanicien/:page",[verifyToken,RoleMiddleware.managerRole], RDVController.getMecanicienDisponible);
 
 
 module.exports = rdv_Router;

@@ -208,11 +208,11 @@ exports.assignRDV = async (data) => {
 exports.read = async (offset, limit) => {
     try {
         return await RendezVous.find().
-                    skip(offset).
-                    limit(limit).
-                    populate("client").
-                    populate("mecanicien").
-                    populate("voiture");
+            skip(offset).
+            limit(limit).
+            populate("client").
+            populate("mecanicien").
+            populate("voiture");
     } catch (error) {
         console.error(error);
         throw error;
@@ -227,25 +227,25 @@ exports.readByMecanicien = async (offset, limit, data) => {
             data.date_debut = new Date();
         }
         if (!data.date_fin) {
-            let temp_date = new Date(data.date_debut); 
+            let temp_date = new Date(data.date_debut);
             temp_date.setDate(temp_date.getDate() + 7); // Ajoute 7 jour
             data.date_fin = temp_date;
         }
         // Construire la condition de recherche
         const searchConditions = {
             mecanicien: data.mecanicien,
-            date_heure_debut: { 
+            date_heure_debut: {
                 $gte: new Date(data.date_debut), // Début de la plage
                 $lte: new Date(data.date_fin)   // Fin de la plage
             },
-        };  
-        
-        return await RendezVous.find(searchConditions).sort({date_heure_debut:1}).
-                    skip(offset).
-                    limit(limit).
-                    populate("client").
-                    populate("mecanicien").
-                    populate("voiture");
+        };
+
+        return await RendezVous.find(searchConditions).sort({ date_heure_debut: 1 }).
+            skip(offset).
+            limit(limit).
+            populate("client").
+            populate("mecanicien").
+            populate("voiture");
     } catch (error) {
         console.error(error);
         throw error;
@@ -253,22 +253,107 @@ exports.readByMecanicien = async (offset, limit, data) => {
     }
 }
 // liste de tous les rendez-vous par mecanicien entre deux dates
-exports.readByStatus = async (offset, limit,data) => {
+exports.readByStatus = async (offset, limit, data) => {
     try {
         // Construire la condition de recherche
         const searchConditions = {
-            statut:data.statut
+            statut: data.statut
         };
         console.log(data);
         return await RendezVous.find(searchConditions).
-                    skip(offset).
-                    limit(limit).
-                    populate("client").
-                    populate("mecanicien").
-                    populate("voiture");
+            skip(offset).
+            limit(limit).
+            populate("client").
+            populate("mecanicien").
+            populate("voiture");
     } catch (error) {
         console.error(error);
         throw error;
 
+    }
+}
+
+exports.getMecanicienDisponible = async (offset, limit, data) => {
+    let error_field = [];
+    try {
+        let newDateRendezVous = new Date(data.date_debut);
+        let now = new Date();
+
+        if (newDateRendezVous < now) {
+            error_field.push({ field: "date_rendez_vous", message: "La nouvelle date de rendez-vous doit être supérieure ou égale à maintenant!" });
+            throw { message: "Validation failed", errors: error_field };
+
+        }
+        let condition = {};
+        if (!data.date_fin) {
+
+            condition = {
+                $or: [ // "OR" pour inclure les cas où la nouvelle date est hors de la plage
+                    { date_heure_debut: { $gt: newDateRendezVous } }, // Avant la plage
+                    { date_heure_fin: { $lt: newDateRendezVous } },    // Après la plage
+                    { statut: { $ne: 'Non Assigné' } }                  // Exclure ceux avec statut "Non Assigné"
+
+                ]
+            }
+        }
+        else {
+            let newDateFinRendezVous = new Date(data.date_fin);
+
+            condition = {
+                $and: [
+                    {
+                        $nor: [
+                            { date_heure_debut: { $gt: newDateRendezVous } }, // Avant la plage
+                            { date_heure_fin: { $lt: newDateRendezVous } },   // Après la plage
+                            { statut: { $ne: 'Non Assigné' } }                  // Exclure ceux avec statut "Non Assigné"
+
+                        ]
+                    },
+                    {
+                        $nor: [
+                            { date_heure_debut: { $gte: newDateFinRendezVous } }, // Nouvelle fin est avant ou égale au début
+                            { date_heure_fin: { $lt: newDateFinRendezVous } },     // Nouvelle fin est après
+                            { statut: { $ne: 'Non Assigné' } }                  // Exclure ceux avec statut "Non Assigné"
+
+                        ]
+                    }
+                ]
+
+            };
+        }
+
+
+
+        const mecaniciens = await RendezVous.find(condition) // Liste de mécaniciens indisponibles
+            .select("mecanicien")
+            .populate("mecanicien");
+            // Récupère uniquement le champ 'mecanicien'
+
+        // Crée une liste des mécaniciens déjà pris
+        let list_meca_pris = [];
+        mecaniciens.forEach(meca => {
+            if (meca.mecanicien) {
+                list_meca_pris.push(meca.mecanicien._id); // On récupère l'id du mécanicien
+            }
+        });
+
+        // Recherche des mécaniciens disponibles (qui ne sont pas dans list_meca_pris)
+        let mecanicien_disponible = await Utilisateur.find({
+            _id: { $nin: list_meca_pris } ,role:"mecanicien"// $nin pour sélectionner les utilisateurs dont l'id n'est pas dans la liste
+        }) .skip(offset)
+        .limit(limit);
+
+        console.log(mecanicien_disponible);
+
+        return mecanicien_disponible;
+    } catch (error) {
+        console.error(error);
+        if (error.errors) {
+            error.errors.concat(error_field);
+            throw { message: error.message, errors: error.errors };
+        } else {
+            // Gestion d'autres erreurs imprévues
+            throw error;
+        }
     }
 }

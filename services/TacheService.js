@@ -10,7 +10,7 @@ exports.readBy = async (offset, limit, data) => {
     }
 }
 
-exports.update_statut= async (data) => {
+exports.update_Tache= async (data) => {
     try {
         if (data.id  && mongoose.Types.ObjectId.isValid(data.id)) {
             const tache = await Tache.findOne({ _id: data.id });

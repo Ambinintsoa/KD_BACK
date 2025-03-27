@@ -1,20 +1,30 @@
 const jwt = require('jsonwebtoken');
 
-function adminRole(req,res,next){
-    const token = req.header('Authorization');
+function checkRole(token,role,req,next){
+   
 
     if (!token || !token.startsWith('Bearer ')) {
-        return res.status(401).json({ error: 'Permission non accordé' });
+        throw new Error('Permission non accordé');
     }
     try {
         const token_without_bearer = token.split(' ')[1];
         const decoded = jwt.verify(token_without_bearer, process.env.SECRET_KEY_ACCESS);
         req.userId = decoded.userId;
-        if(decoded.role==="admin"){
+        console.log(decoded.role);
+        if(decoded.role===role){ 
             next()
         }else{
-             res.status(401).json({ error: 'Vous n\'avez pas la permission pour cette fonction' + error });
+             throw new Error('Vous n\'avez pas la permission pour cette fonction' );
         }
+    } catch (error) {
+        throw new Error('Invalid token' + error);
+    }
+}
+function adminRole(req,res,next){
+    const token = req.header('Authorization');
+    try {
+       
+        checkRole(token,"admin",req,next);
     } catch (error) {
         res.status(401).json({ error: 'Invalid token' + error });
     }
@@ -22,38 +32,19 @@ function adminRole(req,res,next){
 
 function clientRole(req,res,next){
     const token = req.header('Authorization');
-
-    if (!token || !token.startsWith('Bearer ')) {
-        return res.status(401).json({ error: 'Permission non accordé' });
-    }
     try {
-        const token_without_bearer = token.split(' ')[1];
-        const decoded = jwt.verify(token_without_bearer, process.env.SECRET_KEY_ACCESS);
-        req.userId = decoded.userId;
-        if(decoded.role==="client"){ // changer en client
-            next()
-        }else{
-             res.status(401).json({ error: 'Vous n\'avez pas la permission pour cette fonction' + error });
-        }
+        checkRole(token,"client",req,next);
     } catch (error) {
         res.status(401).json({ error: 'Invalid token' + error });
     }
+    
 }
+
 function managerRole(req,res,next){
     const token = req.header('Authorization');
-
-    if (!token || !token.startsWith('Bearer ')) {
-        return res.status(401).json({ error: 'Permission non accordé' });
-    }
     try {
-        const token_without_bearer = token.split(' ')[1];
-        const decoded = jwt.verify(token_without_bearer, process.env.SECRET_KEY_ACCESS);
-        req.userId = decoded.userId;
-        if(decoded.role==="admin"){ // changer en client
-            next()
-        }else{
-             res.status(401).json({ error: 'Vous n\'avez pas la permission pour cette fonction' + error });
-        }
+       
+        checkRole(token,"admin",req,next);
     } catch (error) {
         res.status(401).json({ error: 'Invalid token' + error });
     }

@@ -5,6 +5,7 @@ const verifyToken = require('../middlewares/AuthMiddleware');
 const RoleMiddleware = require('../middlewares/RoleMiddleware');
 
 rdv_Router.post("/save",[verifyToken], RDVController.saveRDV);
+rdv_Router.put("/update",[verifyToken], RDVController.update);
 rdv_Router.post("/assign",[verifyToken,RoleMiddleware.managerRole], RDVController.assignRDV);
 // rdv_Router.delete("/:id",[verifyToken,RoleMiddleware.adminRole], RDVController.delete);
 rdv_Router.get("/id/:id",[verifyToken], RDVController.readById);

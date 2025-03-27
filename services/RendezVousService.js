@@ -16,23 +16,29 @@ exports.save = async (rdv_data, objet_session) => {
         if (rdv.date_heure_debut < new Date()) {
             error_field.push({ field: "date_heure_debut", message: "La date heure début doit être supérieure ou égale à maintenant !" });
         }
-
         // Vérification du client
-        const client = await Utilisateur.findOne({ _id: rdv.client });
-        if (!client) {
-            error_field.push({ field: "client", message: "Utilisateur invalide !" });
-        }
 
-        // Vérification de la voiture (si elle existe)
-        if (rdv.voiture) {
-            const voiture = await Voiture.findOne({ immatriculation: rdv_data.immatriculation });
-            if (!voiture) {
-                error_field.push({ field: "voiture", message: "Voiture invalide !" });
+        if (rdv.client && mongoose.Types.ObjectId.isValid(rdv.client)) {
+            const client = await Utilisateur.findOne({ _id: rdv.client });
+            if (!client) {
+                error_field.push({ field: "client", message: "Client invalide!" });
             }
+        } else {
+            error_field.push({ field: "client", message: "ID de client invalide!" });
+        }
+        // Vérification de la voiture
+
+        if (rdv.voiture && mongoose.Types.ObjectId.isValid(rdv.voiture)) {
+            const voiture = await Voiture.findOne({ _id: rdv.voiture });
+            if (!voiture) {
+                error_field.push({ field: "voiture", message: "Voiture invalide!" });
+            }
+        } else {
+            error_field.push({ field: "voiture", message: "ID de voiture invalide!" });
         }
 
-         // Si la liste d'erreurs contient des erreurs, on les renvoie
-         if (error_field.length > 0) {
+        // Si la liste d'erreurs contient des erreurs, on les renvoie
+        if (error_field.length > 0) {
             throw { message: "Validation failed", errors: error_field };
         }
         // // Vérification des doublons
@@ -41,7 +47,7 @@ exports.save = async (rdv_data, objet_session) => {
             return existingRdv;
         }
 
-       
+
 
         // Sauvegarder le rendez-vous dans la session
         await rdv.save(objet_session);
@@ -222,7 +228,7 @@ exports.read = async (offset, limit) => {
 }
 
 // liste de tous les rendez-vous suivant des conditions
-exports.readBy = async (offset, limit,data) => {
+exports.readBy = async (offset, limit, data) => {
     try {
         return await RendezVous.find(data).
             skip(offset).
@@ -238,7 +244,7 @@ exports.readBy = async (offset, limit,data) => {
 }
 exports.readById = async (id) => {
     try {
-        return await RendezVous.find({_id:id}).
+        return await RendezVous.find({ _id: id }).
             populate("client").
             populate("mecanicien").
             populate("voiture");
@@ -308,17 +314,17 @@ exports.getMecanicienDisponible = async (offset, limit, data) => {
         let newDateRendezVous = new Date(data.date_debut);
         let now = new Date();
 
-        // if (newDateRendezVous < now) {
-        //     error_field.push({ field: "date_rendez_vous", message: "La nouvelle date de rendez-vous doit être supérieure ou égale à maintenant!" });
-        //     // throw { message: "Validation failed", errors: error_field };
+        if (newDateRendezVous < now) {
+            error_field.push({ field: "date_rendez_vous", message: "La nouvelle date de rendez-vous doit être supérieure ou égale à maintenant!" });
+            // throw { message: "Validation failed", errors: error_field };
 
-        // }
-        
+        }
+
         const { date_fin } = data; // Extraire la date de fin de l'entrée
         let condition;
-        
+
         if (!date_fin) {
-            
+
             condition = {
                 statut: "Assigné", // Filtrer uniquement les rendez-vous assignés
                 $and: [
@@ -333,7 +339,7 @@ exports.getMecanicienDisponible = async (offset, limit, data) => {
             };
         } else {
             const newDateFinRendezVous = new Date(date_fin);
-            if(newDateFinRendezVous<=newDateRendezVous){
+            if (newDateFinRendezVous <= newDateRendezVous) {
                 error_field.push({ field: "date_fin_rendez_vous", message: "La fin du rendez-vous doit être après le debut maintenant!" });
             }
             condition = {
@@ -366,15 +372,15 @@ exports.getMecanicienDisponible = async (offset, limit, data) => {
         }
 
         console.log(condition);
-        if(error_field.length>0){
-             throw { message: "Validation failed", errors: error_field };
-        }    
-        
+        if (error_field.length > 0) {
+            throw { message: "Validation failed", errors: error_field };
+        }
+
         // Rechercher les rendez-vous en fonction de la condition
         const mecaniciens = await RendezVous.find(condition)
             .select("mecanicien")
             .populate("mecanicien");
-        
+
 
         // Crée une liste des mécaniciens déjà pris
         let list_meca_pris = [];
@@ -386,9 +392,9 @@ exports.getMecanicienDisponible = async (offset, limit, data) => {
         console.log(list_meca_pris);
         // Recherche des mécaniciens disponibles (qui ne sont pas dans list_meca_pris)
         let mecanicien_disponible = await Utilisateur.find({
-            _id: { $nin: list_meca_pris } ,role:"mecanicien"// $nin pour sélectionner les utilisateurs dont l'id n'est pas dans la liste
-        }) .skip(offset)
-        .limit(limit);
+            _id: { $nin: list_meca_pris }, role: "mecanicien"// $nin pour sélectionner les utilisateurs dont l'id n'est pas dans la liste
+        }).skip(offset)
+            .limit(limit);
 
 
         return mecanicien_disponible;
@@ -399,7 +405,87 @@ exports.getMecanicienDisponible = async (offset, limit, data) => {
             error.errors.concat(error_field);
             throw { message: error.message, errors: error.errors };
         } else {
-            // Gestion d'autres erreurs imprévues
+
+            throw error;
+        }
+    }
+}
+
+exports.updateRDV = async (data) => {
+    const error_field = [];
+    try {
+        const rdv = new RendezVous(data);
+        if (!rdv._id) {
+            error_field.push({ field: "id", message: "Veuiller fournir un Id pour le rendez vous!" });
+            throw { message: error.message, errors: error.errors };
+
+        }
+
+        const rdv_initial = RendezVous.find({ _id: rdv_id });
+        if (!rdv_initial) {
+            error_field.push({ field: "id", message: "Veuiller fournir un Id valide pour le rendez vous!" });
+            throw { message: error.message, errors: error.errors };
+        }
+        if (rdv.date_heure_fin) {
+            if (rdv.date_heure_debut >= rdv.date_heure_fin) {
+                error_field.push({ field: "date_heure_fin", message: "La date de debut doit être avant la date fin!" });
+            }
+        }
+        if (rdv.montant_total && rdv.montant_total < 0) {
+            error_field.push({ field: "montant_total", message: "Le montant total doit etre une valeur positive!" });
+        }
+
+        // Vérification du client
+        if (rdv.client && mongoose.Types.ObjectId.isValid(rdv.client)) {
+            const client = await Utilisateur.findOne({ _id: rdv.client });
+            if (!client) {
+                error_field.push({ field: "client", message: "Client invalide!" });
+            }
+        } else {
+            error_field.push({ field: "client", message: "ID de client invalide!" });
+        }
+
+        // Vérification du mecanicien
+        if (rdv.mecanicien && mongoose.Types.ObjectId.isValid(rdv.mecanicien)) {
+            const mecanicien = await Utilisateur.findOne({ _id: rdv.mecanicien });
+            if (!mecanicien) {
+                error_field.push({ field: "mecanicien", message: "Mecanicien invalide!" });
+            }
+        } else {
+            error_field.push({ field: "mecanicien", message: "ID de mecanicien invalide!" });
+        }
+        // Vérification de la voiture
+        if (rdv.voiture && mongoose.Types.ObjectId.isValid(rdv.voiture)) {
+            const voiture = await Voiture.findOne({ _id: rdv.voiture });
+            if (!voiture) {
+                error_field.push({ field: "voiture", message: "Voiture invalide!" });
+            }
+        } else {
+            error_field.push({ field: "voiture", message: "ID de voiture invalide!" });
+        }
+
+        if (error_field.length > 0) {
+            throw { message: "Validation failed", errors: error_field };
+        }
+
+
+        rdv_initial.date_heure_debut = (rdv.date_heure_debut) || rdv_initial.date_heure_debut;
+        rdv_initial.date_heure_fin = (rdv.date_heure_fin) || rdv_initial.date_heure_fin;
+        rdv_initial.client = (rdv.client) || rdv_initial.client;
+        rdv_initial.voiture = (rdv.voiture) || rdv_initial.voiture;
+        rdv_initial.mecanicien = (rdv.mecanicien) || rdv_initial.mecanicien;
+        rdv_initial.montant_total = (rdv.montant_total) || rdv_initial.montant_total;
+        rdv_initial.statut = (rdv.statut) || rdv_initial.statut;
+        rdv_initial.etat = (rdv.etat) || rdv_initial.etat;
+
+        rdv_initial.save();
+
+    } catch (error) {
+        console.error(error);
+        if (error.errors) {
+            error.errors.concat(error_field);
+            throw { message: error.message, errors: error.errors };
+        } else {
             throw error;
         }
     }

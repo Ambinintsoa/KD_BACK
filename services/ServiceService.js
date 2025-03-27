@@ -22,22 +22,28 @@ exports.save = async (serviceData) => {
 exports.read = async (page, limit, search, sortBy, sortOrder) => {
     try {
         const query = search
-            ? { nom_service: { $regex: search, $options: "i" } } // Recherche insensible à la casse
-            : {};
-
-        const sortOption = {};
-        sortOption[sortBy] = sortOrder === "desc" ? -1 : 1; // Tri ascendant ou descendant
-        if (page < 1) {
-            page = 1;
-        }
-        const services = await Service.find(query)
-        .collation({ locale: 'fr', strength: 2 })
-            .sort(sortOption)
-            .skip((page - 1) * limit)
-            .limit(limit);
-        const total = await Service.countDocuments(query);
-
-        return { services, total };
+        ? { nom_service: { $regex: search, $options: "i" } } // Recherche insensible à la casse
+        : {};
+    
+    const sortOption = {};
+    sortOption[sortBy] = sortOrder === "desc" ? -1 : 1; // Tri ascendant ou descendant
+    if (page < 1) {
+        page = 1;
+    }
+    
+    const services = await Service.find(query)
+        .collation({ locale: 'fr', strength: 2 })  // Collation pour tri insensible à la casse
+        .sort(sortOption)
+        .where('statut', 0)
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .populate('categorie_service', 'nom_categorie') 
+        .set('strictPopulate', false); 
+    
+    const total = await Service.countDocuments(query);
+    
+    return { services, total };
+    
     } catch (error) {
         console.log(error.message)
         throw new Error("Erreur lors de la récupération des services");
@@ -72,26 +78,27 @@ exports.update = async (data) => {
         if (!initial_service) throw new Error("Aucun service correspondant !");
         
         if (service.prix && service.prix < 0) throw new Error("Le prix doit avoir une valeur positive !");
-        
-        initial_service.nom_service = (service.nom_service && service.nom_service.trim()) || ''; // Mise à jour de l'attribut
-        initial_service.duree = (service.duree || service.duree === 0) ? service.duree : 0; // Mise à jour de l'attribut
-        initial_service.prix = (service.prix || service.prix === 0) ? service.prix : 0; // Mise à jour de l'attribut
-        initial_service.categorie_service = service.categorie_service || initial_service.categorie_service; // Mise à jour de l'attribut
-
-
+        if(service.statut){
+            initial_service.statut = service.statut || initial_service.statut; 
+        }else{
+            initial_service.nom_service = (service.nom_service && service.nom_service.trim()) || ''; // Mise à jour de l'attribut
+            initial_service.duree = (service.duree || service.duree === 0) ? service.duree : 0; // Mise à jour de l'attribut
+            initial_service.prix = (service.prix || service.prix === 0) ? service.prix : 0; // Mise à jour de l'attribut
+            initial_service.categorie_service = service.categorie_service._id || initial_service.categorie_service; // Mise à jour de l'attribut
+        }
         await initial_service.save(); // Sauvegarde les modifications
     } catch (error) {
         console.error(error);
         throw error;
     }
 }
-//supprime un service a partir de l'id
-exports.delete = async (id) => {
-    try {
-        const serviceSupprime = await Service.findByIdAndDelete(id);
-        console.log(serviceSupprime); // Affiche le service supprimé
-    } catch (error) {
-        console.error(error);
-        throw error;
-    }
-}
+
+    exports.countDocuments = async (filter) => {
+        try {
+            const count = await Service.countDocuments(filter);
+            return count;
+        } catch (error) {
+            console.error("Erreur lors du comptage des documents :", error);
+            throw new Error('Erreur lors du comptage des documents');
+        }
+    };

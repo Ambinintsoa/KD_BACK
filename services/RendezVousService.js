@@ -281,53 +281,71 @@ exports.getMecanicienDisponible = async (offset, limit, data) => {
 
         if (newDateRendezVous < now) {
             error_field.push({ field: "date_rendez_vous", message: "La nouvelle date de rendez-vous doit être supérieure ou égale à maintenant!" });
-            throw { message: "Validation failed", errors: error_field };
+            // throw { message: "Validation failed", errors: error_field };
 
         }
-        let condition = {};
-        if (!data.date_fin) {
-
+        
+        const { date_fin } = data; // Extraire la date de fin de l'entrée
+        let condition;
+        
+        if (!date_fin) {
+            
             condition = {
-                $or: [ // "OR" pour inclure les cas où la nouvelle date est hors de la plage
-                    { date_heure_debut: { $gt: newDateRendezVous } }, // Avant la plage
-                    { date_heure_fin: { $lt: newDateRendezVous } },    // Après la plage
-                    { statut: { $ne: 'Non Assigné' } }                  // Exclure ceux avec statut "Non Assigné"
-
-                ]
-            }
-        }
-        else {
-            let newDateFinRendezVous = new Date(data.date_fin);
-
-            condition = {
+                statut: "Assigné", // Filtrer uniquement les rendez-vous assignés
                 $and: [
+                    { date_heure_debut: { $lte: newDateRendezVous } },
                     {
-                        $nor: [
-                            { date_heure_debut: { $gt: newDateRendezVous } }, // Avant la plage
-                            { date_heure_fin: { $lt: newDateRendezVous } },   // Après la plage
-                            { statut: { $ne: 'Non Assigné' } }                  // Exclure ceux avec statut "Non Assigné"
-
-                        ]
-                    },
-                    {
-                        $nor: [
-                            { date_heure_debut: { $gte: newDateFinRendezVous } }, // Nouvelle fin est avant ou égale au début
-                            { date_heure_fin: { $lt: newDateFinRendezVous } },     // Nouvelle fin est après
-                            { statut: { $ne: 'Non Assigné' } }                  // Exclure ceux avec statut "Non Assigné"
-
+                        $or: [
+                            { date_heure_fin: { $gte: newDateRendezVous } }, // Fin >= nouvelle date
+                            { date_heure_fin: { $exists: false } }           // Fin est null ou absente
                         ]
                     }
                 ]
-
+            };
+        } else {
+            const newDateFinRendezVous = new Date(date_fin);
+            if(newDateFinRendezVous<=newDateRendezVous){
+                error_field.push({ field: "date_fin_rendez_vous", message: "La fin du rendez-vous doit être après le debut maintenant!" });
+            }
+            condition = {
+                statut: "Assigné",
+                $or: [
+                    {
+                        $and: [
+                            { date_heure_debut: { $lte: newDateRendezVous } },
+                            {
+                                $or: [
+                                    { date_heure_fin: { $gte: newDateRendezVous } },
+                                    { date_heure_fin: { $exists: false } } // Gère les `null` ou champs absents
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        $and: [
+                            { date_heure_debut: { $lte: newDateFinRendezVous } },
+                            {
+                                $or: [
+                                    { date_heure_fin: { $gte: newDateFinRendezVous } },
+                                    { date_heure_fin: { $exists: false } } // Gère les `null` ou champs absents
+                                ]
+                            }
+                        ]
+                    }
+                ]
             };
         }
 
-
-
-        const mecaniciens = await RendezVous.find(condition) // Liste de mécaniciens indisponibles
+        console.log(condition);
+        if(error_field.length>0){
+             throw { message: "Validation failed", errors: error_field };
+        }    
+        
+        // Rechercher les rendez-vous en fonction de la condition
+        const mecaniciens = await RendezVous.find(condition)
             .select("mecanicien")
             .populate("mecanicien");
-            // Récupère uniquement le champ 'mecanicien'
+        
 
         // Crée une liste des mécaniciens déjà pris
         let list_meca_pris = [];
@@ -343,9 +361,9 @@ exports.getMecanicienDisponible = async (offset, limit, data) => {
         }) .skip(offset)
         .limit(limit);
 
-        console.log(mecanicien_disponible);
 
         return mecanicien_disponible;
+
     } catch (error) {
         console.error(error);
         if (error.errors) {

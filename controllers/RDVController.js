@@ -50,6 +50,33 @@ exports.read = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+exports.readBy = async (req, res) => {
+
+    try {
+        let page=req.params.page || 1;
+        let limit=10;
+        const offset = (page - 1) * limit;
+        const rendezvous=await RendezVousService.readBy(offset,limit,req.body);
+
+        res.status(200).json({ rendezvous:rendezvous });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: error.message });
+    }
+};
+exports.readById = async (req, res) => {
+
+    try {
+        
+        const rendezvous=await RendezVousService.readById(req.params.id);
+
+        res.status(200).json({ rendezvous:rendezvous });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: error.message });
+    }
+};
 exports.readByMecanicien = async (req, res) => {
 
     try {

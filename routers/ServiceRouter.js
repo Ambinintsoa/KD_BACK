@@ -6,9 +6,9 @@ const RoleMiddleware = require('../middlewares/RoleMiddleware');
 
 serviceRouter.post("/save",[verifyToken,RoleMiddleware.adminRole], ServiceController.save);
 serviceRouter.put("/update",[verifyToken,RoleMiddleware.adminRole], ServiceController.update);
-serviceRouter.delete("/:id",[verifyToken,RoleMiddleware.adminRole], ServiceController.delete);
+serviceRouter.delete("",[verifyToken,RoleMiddleware.adminRole], ServiceController.delete);
 
-serviceRouter.get("/:page",[verifyToken], ServiceController.read);
+serviceRouter.get("",[verifyToken], ServiceController.read);
 serviceRouter.get("/search/:page",[verifyToken], ServiceController.readBy);
 serviceRouter.get("/id/:id",[verifyToken], ServiceController.readById);
 

@@ -16,10 +16,6 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
     try {
         let token = await  userService.login(req.body);
-       
-        res.cookie("refresh_token",token.token_refresh, { httpOnly: true, sameSite: 'strict' })
-        .header('Authorization', token.token_access);
-        
         res.status(201).json({ token: token });
 
     } catch (error) {
@@ -56,21 +52,30 @@ exports.update=async (req,res)=>{
     }
 }
 
-exports.refreshToken=async (req,res)=>{
-    const refreshToken = req.cookies.refresh_token;
-  if (!refreshToken) {
-    return res.status(401).send('Access Denied. No refresh token provided.');
+exports.refreshToken = async (req, res) => {
+    const refreshToken = req.body.refresh;
+  
+    if (!refreshToken) {
+      return res.status(403).json({ message: 'Aucun refresh token fourni' });
+    }
+  
+    try {
+      const decoded = jwt.verify(refreshToken, process.env.SECRET_KEY_REFRESH);
+  
+      const accessToken = jwt.sign(
+        { userId: decoded.userId },
+        process.env.SECRET_KEY_ACCESS,
+        { expiresIn: '10m' }
+      );
+  
+      return res.status(200).json({
+        token: accessToken,
+        userId: decoded.userId
+      });
+    } catch (error) {
+      return res.status(403).json({ message: 'Refresh token invalide', error });
+    }
   }
 
-  try {
-    const decoded = jwt.verify(refreshToken,  process.env.SECRET_KEY_REFRESH);
-    const accessToken = jwt.sign({ userId: decoded.userId },  process.env.SECRET_KEY_ACCESS, { expiresIn: '1h' });
 
-    res
-      .header('Authorization', accessToken)
-      .send(decoded.userId);
-  } catch (error) {
-    return res.status(400).send('Invalid refresh token.'+error);
-  }
-
-}
+  

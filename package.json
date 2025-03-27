@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/Ambinintsoa/KD_BACK#readme",
   "dependencies": {
+    "sequelize": "^6.6.5", 
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.3",
     "cookie-parser": "^1.4.7",

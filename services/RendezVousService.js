@@ -23,9 +23,7 @@ exports.save = async (rdv_data, objet_session) => {
             if (!client) {
                 error_field.push({ field: "client", message: "Client invalide!" });
             }
-        } else {
-            error_field.push({ field: "client", message: "ID de client invalide!" });
-        }
+        } 
         // Vérification de la voiture
 
         if (rdv.voiture && mongoose.Types.ObjectId.isValid(rdv.voiture)) {
@@ -33,9 +31,7 @@ exports.save = async (rdv_data, objet_session) => {
             if (!voiture) {
                 error_field.push({ field: "voiture", message: "Voiture invalide!" });
             }
-        } else {
-            error_field.push({ field: "voiture", message: "ID de voiture invalide!" });
-        }
+        } 
 
         // Si la liste d'erreurs contient des erreurs, on les renvoie
         if (error_field.length > 0) {
@@ -46,8 +42,6 @@ exports.save = async (rdv_data, objet_session) => {
         if (existingRdv) {
             return existingRdv;
         }
-
-
 
         // Sauvegarder le rendez-vous dans la session
         await rdv.save(objet_session);
@@ -86,10 +80,26 @@ exports.saveRDV = async (req) => {
         const last_rdv = await exports.save(otherData, { session });
         let error_field = []; // Assurez-vous que error_field est défini
         let i = 1;
+        let list=[];
+
+        taches.map((tacheData) => {
+            list.push(tacheData.service);
+        });
+        
+        // Vérification des doublons
+        const hasDuplicates = new Set(list).size !== list.length;
+        
+        if (hasDuplicates) {
+            error_field.push({
+                field: `service`,
+                message: `Les services ne doivent pas contenir de doublons!` ,
+            });
+        } 
 
         // Créer des objets de tâches à insérer
         const taches_obj = await Promise.all(
             taches.map(async (tacheData) => {
+                list.push(tacheData.service);
                 if (!mongoose.Types.ObjectId.isValid(tacheData.service)) {
                     error_field.push({
                         field: `service${i}`,
@@ -266,7 +276,7 @@ exports.readByMecanicien = async (offset, limit, data) => {
             temp_date.setDate(temp_date.getDate() + 7); // Ajoute 7 jour
             data.date_fin = temp_date;
         }
-        // Construire la condition de recherche
+        
         const searchConditions = {
             mecanicien: data.mecanicien,
             date_heure_debut: {
@@ -441,9 +451,7 @@ exports.updateRDV = async (data) => {
             if (!client) {
                 error_field.push({ field: "client", message: "Client invalide!" });
             }
-        } else {
-            error_field.push({ field: "client", message: "ID de client invalide!" });
-        }
+        } 
 
         // Vérification du mecanicien
         if (rdv.mecanicien && mongoose.Types.ObjectId.isValid(rdv.mecanicien)) {
@@ -451,18 +459,14 @@ exports.updateRDV = async (data) => {
             if (!mecanicien) {
                 error_field.push({ field: "mecanicien", message: "Mecanicien invalide!" });
             }
-        } else {
-            error_field.push({ field: "mecanicien", message: "ID de mecanicien invalide!" });
-        }
+        } 
         // Vérification de la voiture
         if (rdv.voiture && mongoose.Types.ObjectId.isValid(rdv.voiture)) {
             const voiture = await Voiture.findOne({ _id: rdv.voiture });
             if (!voiture) {
                 error_field.push({ field: "voiture", message: "Voiture invalide!" });
             }
-        } else {
-            error_field.push({ field: "voiture", message: "ID de voiture invalide!" });
-        }
+        } 
 
         if (error_field.length > 0) {
             throw { message: "Validation failed", errors: error_field };

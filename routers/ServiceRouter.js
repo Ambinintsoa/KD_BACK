@@ -11,6 +11,8 @@ serviceRouter.delete("",[verifyToken,RoleMiddleware.adminRole], ServiceControlle
 serviceRouter.get("",[verifyToken], ServiceController.read);
 serviceRouter.get("/search/:page",[verifyToken], ServiceController.readBy);
 serviceRouter.get("/id/:id",[verifyToken], ServiceController.readById);
+serviceRouter.get("/serviceCategorie",[verifyToken], ServiceController.getAllServicesByCategories);
+
 
 
 module.exports = serviceRouter;

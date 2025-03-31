@@ -41,8 +41,8 @@ app.listen(port, () => {
 
 // require('./default_data/default_data_user');
 // require('./default_data/generateDefaultMarque');
+// require('./default_data/generateDefaultCategorieVoiture');
 // require('./default_data/generateDefaultCars');
-require('./default_data/generateDefaultCategorieVoiture');
 
 
 // require('./default_data/generateDefaultCategories');

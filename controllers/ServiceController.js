@@ -49,7 +49,7 @@ exports.save = async (req, res) => {
 exports.getAllServicesByCategories = async (req, res) => {
     try {
         let resultat=await ServiceService.getAllServicesByCategories();
-        res.status(201).json({ services: resultat });
+        res.status(201).json({ resultat:resultat });
 
     } catch (error) {
         console.error(error);

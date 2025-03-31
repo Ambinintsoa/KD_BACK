@@ -85,6 +85,7 @@ exports.update = async (data) => {
             initial_service.duree = (service.duree || service.duree === 0) ? service.duree : 0; // Mise à jour de l'attribut
             initial_service.prix = (service.prix || service.prix === 0) ? service.prix : 0; // Mise à jour de l'attribut
             initial_service.categorie_service = service.categorie_service._id || initial_service.categorie_service; // Mise à jour de l'attribut
+            initial_service.promotions = service.promotions||initial_service.promotions; // Mise à jour de l'attribut
         }
         await initial_service.save(); // Sauvegarde les modifications
     } catch (error) {
@@ -102,3 +103,63 @@ exports.update = async (data) => {
             throw new Error('Erreur lors du comptage des documents');
         }
     };
+    exports.promotions = async ()=>{
+            try {
+              const now = new Date(); // Date actuelle fixée pour le test
+          
+              const services = await Service.aggregate([
+                // Filtrer les services ayant au moins une promotion active
+                {
+                  $match: {
+                    "promotions.date_debut": { $lte: now },
+                    "promotions.date_fin": { $gte: now },
+                    statut: 0 // Optionnel : filtre sur statut actif
+                  }
+                },
+                // Filtrer le tableau promotions pour ne garder que les promotions actives
+                {
+                  $project: {
+                    nom_service: 1,
+                    duree: 1,
+                    prix: 1,
+                    statut: 1,
+                    categorie_service: 1,
+                    createdAt: 1,
+                    updatedAt: 1,
+                    promotions: {
+                      $filter: {
+                        input: "$promotions",
+                        cond: {
+                          $and: [
+                            { $lte: ["$$this.date_debut", now] },
+                            { $gte: ["$$this.date_fin", now] }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                },
+                // Peupler categorie_service
+                {
+                  $lookup: {
+                    from: "categorieservices", // Nom de la collection (minuscule par défaut)
+                    localField: "categorie_service",
+                    foreignField: "_id",
+                    as: "categorie_service"
+                  }
+                },
+                { $unwind: { path: "$categorie_service", preserveNullAndEmptyArrays: true } },
+                // Sélectionner 3 services aléatoirement
+                //{ $sample: { size: 3 } }
+              ]);
+          
+              if (services.length === 0) {
+                throw new Error('Aucun service avec promotion active trouvé');
+              }
+          
+              return services;
+            } catch (error) {
+              console.error(error);
+              throw new Error('Erreur lors de la récuperation des promotions');
+            }
+    }

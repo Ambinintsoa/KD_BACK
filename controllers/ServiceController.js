@@ -149,7 +149,15 @@ exports.delete = async (req, res) => {
     }
 };
 
-
+exports.allPromotions=async(req ,res)=>{
+    try {
+    let promotions = await ServiceService.allPromotions();
+    res.status(200).json({ promotions:promotions });
+    } catch (error) {
+     console.error(error);
+     res.status(500).json({ error: "Une erreur est survenue lors de la récupération des promotions", details: error.message });
+    }
+ }
 
 
 

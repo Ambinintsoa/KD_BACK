@@ -9,6 +9,7 @@ serviceRouter.put("/update",[verifyToken,RoleMiddleware.adminRole], ServiceContr
 serviceRouter.delete("",[verifyToken,RoleMiddleware.adminRole], ServiceController.delete);
 
 serviceRouter.get("",[verifyToken], ServiceController.read);
+serviceRouter.get("/promotions", ServiceController.allPromotions);
 serviceRouter.get("/search/:page",[verifyToken], ServiceController.readBy);
 serviceRouter.get("/id/:id",[verifyToken], ServiceController.readById);
 

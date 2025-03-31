@@ -151,7 +151,7 @@ exports.delete = async (req, res) => {
 
 exports.allPromotions=async(req ,res)=>{
     try {
-    let promotions = await ServiceService.allPromotions();
+    let promotions = await ServiceService.promotions();
     res.status(200).json({ promotions:promotions });
     } catch (error) {
      console.error(error);

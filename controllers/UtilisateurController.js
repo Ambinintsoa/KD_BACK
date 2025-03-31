@@ -34,8 +34,8 @@ exports.register = async (req, res) => {
 
         if (!genre) {
             errors.push({ field: 'genre', message: 'Le genre est requis' });
-        } else if (!['Homme', 'Femme', 'Autre'].includes(genre)) {
-            errors.push({ field: 'genre', message: 'Le genre doit être Homme, Femme ou Autre' });
+        } else if (!['Homme', 'Femme'].includes(genre)) {
+            errors.push({ field: 'genre', message: 'Le genre doit être Homme ou Femme' });
         }
 
         if (!nom) {
@@ -61,9 +61,7 @@ exports.register = async (req, res) => {
             }
         }
 
-        if (!role) {
-            errors.push({ field: 'role', message: 'Le rôle est requis' });
-        } else if (!['user', 'admin'].includes(role)) {
+        if (role &&!['user', 'admin'].includes(role)) {
             errors.push({ field: 'role', message: 'Le rôle doit être user ou admin' });
         }
 

@@ -53,7 +53,7 @@ exports.read = async (page, limit, search, sortBy, sortOrder, filters={}) => {
         const marques = await Marque.find(query)
         .collation({ locale: 'fr', strength: 2 })
             .sort(sortOption)
-            .where('statut',0)
+            .where('statut',1)
             .skip((page - 1) * limit)
             .limit(limit);
         const total = await Marque.countDocuments(query);

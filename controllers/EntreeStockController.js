@@ -38,6 +38,15 @@ class EntreeStockController {
       res.status(500).json({ error: error.message });
     }
   }
+  static async deleteStockEntry(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await EntreeStockService.deleteStockEntry(id);
+      res.status(200).json(result);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
 }
 
 module.exports = EntreeStockController;

@@ -33,6 +33,24 @@ class DemandeProduitController {
       res.status(500).json({ error: error.message });
     }
   }
+  static async deleteStockEntry(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await DemandeProduitService.deleteStockEntry(id);
+      res.status(200).json(result);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+  static async delete(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await DemandeProduitService.delete(id);
+      res.status(200).json(result);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
 }
 
 module.exports = DemandeProduitController;

@@ -26,6 +26,8 @@ productRouter.get('/reassort-requests', [verifyToken], DemandeProduitController.
 // Routes pour les entrées de stock
 productRouter.post('/stock-entry',  [verifyToken], upload.single('invoice'), EntreeStockController.addStockEntry);
 productRouter.get('/stock-entries',  [verifyToken], EntreeStockController.listStockEntries);
+productRouter.delete('/stock-entry/:id', [verifyToken], EntreeStockController.deleteStockEntry); //
+productRouter.delete('/reassort/:id', [verifyToken], DemandeProduitController.delete); //
 module.exports = productRouter;
 
 

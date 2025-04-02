@@ -1,97 +1,60 @@
-const AvisClientService=require("../services/AvisClientService");
-exports.save = async(req,res)=>{
-    try {
-        await AvisClientService.save(req.body);
-        res.status(201).json({ message: "Insertion réussie" });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: error.message });
-    }
-}
-exports.read = async(req,res)=>{
-    try {
-        let page=req.params.page || 1;
-        let limit=10;
-        const offset = (page - 1) * limit;
-        let avisclients=await AvisClientService.read(offset,limit);
+const AvisClientService = require('../services/AvisClientService');
 
-        res.status(200).json({ avisclients:avisclients });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: error.message });
-    }
-}
-
-exports.readBy = async(req,res)=>{
+class AvisClientController {
+  static async createAvis(req, res) {
     try {
-        let page=req.params.page || 1;
-        let limit=10;
-        const offset = (page - 1) * limit;
-        let avisclients=await AvisClientService.readBy(offset,limit,req.body);
-
-        res.status(200).json({ avisclients:avisclients });
+      const avisData = { ...req.body, client: req.userId }; // client = utilisateur connecté
+      const result = await AvisClientService.createAvis(avisData);
+      res.status(201).json(result);
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: error.message });
+      res.status(500).json({ error: error.message });
     }
-}
-// liste des avis des clients ayant des score plus grans que 5
-exports.readByScoreDESC = async(req,res)=>{
+  }
+
+  static async listAvis(req, res) {
     try {
-        let page=req.params.page || 1;
-        let limit=10;
-        const offset = (page - 1) * limit;
-        let avisclients=await AvisClientService.readByScoreDESC(offset,limit,5);//plus grand que 5
-
-        res.status(200).json({ avisclients:avisclients });
+      const { page, limit, search, sortBy, orderBy } = req.query;
+      const result = await AvisClientService.getAvis({
+        page: parseInt(page) || 1,
+        limit: parseInt(limit) || 10,
+        search: search || '',
+        sortBy: sortBy || 'date',
+        orderBy: orderBy || 'desc'
+      });
+      res.status(200).json(result);
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: error.message });
+      res.status(500).json({ error: error.message });
     }
-}
-exports.readById = async(req,res)=>{
+  }
+
+  static async validateAvis(req, res) {
     try {
-        let avisclient=await AvisClientService.readById(req.params.id);
-
-        res.status(200).json({ avisclient:avisclient });
+      const { id } = req.params;
+      const result = await AvisClientService.validateAvis(id);
+      res.status(200).json(result);
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: error.message });
+      res.status(500).json({ error: error.message });
     }
+  }
+
+  static async deleteAvis(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await AvisClientService.deleteAvis(id);
+      res.status(200).json(result);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+  static async getValidatedAvisRandom(req, res) {
+    try {
+      const { limit } = req.query; // Optionnel : limiter le nombre d’avis
+      const result = await AvisClientService.getValidatedAvisRandom(parseInt(limit) || 5);
+      res.status(200).json(result);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
 }
 
-exports.delete = async(req,res)=>{
-    try {
-        await AvisClientService.delete(req.params.id);
-        res.status(200).json({ message: " L' Avis Client effacé avec succès" });
-
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: error.message });
-    }
-}
-// modifie le statut
-exports.updateStatut = async(req,res)=>{
-    try {
-        await AvisClientService.updateStatut(req.params.id,req.params.statut);
-        res.status(200).json({ message: " Le statut de l' Avis Client est modifié avec succès" });
-
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: error.message });
-    }
-}
-
-exports.readByRandom = async(req,res)=>{
-    try {
-        let limit=req.params.limit;
-        const resultat=await AvisClientService.readRandom(limit);
-        res.status(200).json({ avis_clients: resultat });
-
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: error.message });
-    }
-}
-
-
+module.exports = AvisClientController;

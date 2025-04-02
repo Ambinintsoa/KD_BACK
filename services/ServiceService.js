@@ -28,11 +28,16 @@ exports.save = async (serviceData) => {
 };
 // liste de services avec pagination
 exports.read = async (page, limit, search, sortBy, sortOrder) => {
-  try {
-    const query = search
-      ? { nom_service: { $regex: search, $options: "i" } } // Recherche insensible à la casse
-      : {};
-
+    try {
+        const query = search
+        ? {
+            $or: [
+              { category_name: { $regex: search, $options: "i" } },
+              { nom_service: { $regex: search, $options: "i" } }
+            ]
+          }
+        : {};
+    
     const sortOption = {};
     sortOption[sortBy] = sortOrder === "desc" ? -1 : 1; // Tri ascendant ou descendant
     if (page < 1) {
@@ -49,7 +54,7 @@ exports.read = async (page, limit, search, sortBy, sortOrder) => {
       .set("strictPopulate", false);
 
     const total = await Service.countDocuments(query);
-
+    console.log(services);
     return { services, total };
   } catch (error) {
     console.log(error.message);
@@ -58,16 +63,30 @@ exports.read = async (page, limit, search, sortBy, sortOrder) => {
 };
 // liste de services avec pagination et filtre => condition "et"
 exports.readBy = async (offset, limit, data) => {
-  try {
-    return await Service.find(data)
-      .skip(offset)
-      .limit(limit)
-      .populate("categorie_service");
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
-};
+    try {
+        return await Service.find(data).skip(offset).limit(limit).populate("categorie_service");
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
+exports.getAllServicesByCategories=async()=>{
+    try{
+        let all_categories= await CategorieService.find({statut:0});
+        let liste_categories_services=[];
+        for (const element of all_categories) {
+            const temp_services = await Service.find({ categorie_service: element._id });
+            const temp_object = { categorie_service: element, service_object: temp_services };
+            liste_categories_services.push(temp_object);
+        }
+
+        return liste_categories_services;
+    }catch(error){
+        console.error(error);
+        throw error;
+    }
+}
+ 
 //retourne un service a partir de son id
 exports.readById = async (id) => {
   try {

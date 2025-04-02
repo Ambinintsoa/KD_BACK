@@ -38,7 +38,7 @@ exports.login = async (data) => {
     try {
         const { email, mot_de_passe } = data;
         console.log(data);
-        const user = await Utilisateur.findOne({ email });
+        const user = await Utilisateur.findOne({email: email });
         if (!user) {
             throw new Error('Email invalide');
         }
@@ -105,4 +105,5 @@ exports.update=async(userdata)=>{
         throw error;
     }
 }
+
 

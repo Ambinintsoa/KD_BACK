@@ -47,6 +47,7 @@ exports.save = async (req, res) => {
   }
 };
 
+  
 exports.read = async (req, res) => {
   try {
     let page = parseInt(req.query.page) || 1;
@@ -230,3 +231,14 @@ exports.export = async (req, res) => {
       .json({ error: "Erreur lors de l'exportation : " + error.message });
   }
 };
+
+exports.getAllServicesByCategories = async (req, res) => {
+  try {
+      let resultat=await ServiceService.getAllServicesByCategories();
+      res.status(201).json({ resultat:resultat });
+
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: error.message });
+  }
+}

@@ -10,7 +10,7 @@ exports.generate_accessToken= async (user)=> {
           email: user.email,
         },
         process.env.SECRET_KEY_ACCESS, 
-        { expiresIn: '10m' }//10min
+        { expiresIn: '1h' }//10min
       );
 };
 // Fonction pour générer un Refresh Token

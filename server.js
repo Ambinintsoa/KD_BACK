@@ -30,6 +30,9 @@ app.use('/avisclient',require('./routers/AvisClientRouter'));
 app.use('/marque',require('./routers/MarqueRouter'));
 app.use('/categorievoiture',require('./routers/CategorieVoitureRouter'));
 
+app.use('/rendezvous',require('./routers/RDVRouter'));
+app.use('/tache',require('./routers/TacheRouter'));
+app.use('/devis',require('./routers/DevisRouter'));
 
 // Route principale
 app.get("/", (req, res) => {

@@ -1,2 +1,47 @@
+# 💾 Dépendances Node.js
 node_modules/
+npm-debug.log
+yarn.lock
+package-lock.json
+
+# 🚀 Déploiement et builds
+dist/
+build/
+*.log
+
+# 🔒 Fichiers sensibles et secrets
 .env
+.env.local
+.env.development
+.env.production
+.env.test
+.env.*
+config/*.json  # Si tes fichiers de config contiennent des données sensibles
+
+# ⚙️ Logs et erreurs
+logs/
+*.log
+*.out
+*.pid
+*.seed
+*.sqlite
+
+# 🗑️ Fichiers temporaires
+tmp/
+temp/
+.cache/
+coverage/  # Résultats des tests de couverture
+public/uploads/  # Si les utilisateurs uploadent des fichiers
+
+# 🖼️ Stockage temporaire
+*.bak
+*.swp
+*.swo
+
+# 🔍 Éditeurs et OS
+.DS_Store  # macOS
+Thumbs.db  # Windows
+.vscode/  # Visual Studio Code
+.idea/  # WebStorm / PhpStorm
+
+uploads/

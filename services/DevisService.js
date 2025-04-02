@@ -1,6 +1,16 @@
-const PrixServiceCategorie = require('../models/PrixServiceCategorie');
-const PrixProduitMarque = require('../models/PrixProduitMarque');
-const UsageProduitService = require('../models/UsageProduitService');
+const mongoose = require("mongoose");
+
+const PrixServiceCategorie = require("../models/PrixServiceCategorie");
+const PrixProduitMarque = require("../models/PrixProduitMarque");
+const UsageProduitService = require("../models/UsageProduitService");
+
+// Fonction utilitaire pour convertir en ObjectId
+const toObjectId = (id) => {
+    if (mongoose.isValidObjectId(id)) {
+        return new mongoose.Types.ObjectId(id);
+    }
+    throw new Error(`Invalid ObjectId: ${id}`);
+};
 
 const getLigneDevis = async (voiture_data, liste_services) => {
     try {
@@ -8,82 +18,119 @@ const getLigneDevis = async (voiture_data, liste_services) => {
         let total_devis = 0;
 
         for (const service of liste_services) {
-            console.log("coucou",service);
-
-            let detail_service = await getPrixCategorieVoitureByService(voiture_data.categorie, service);
-            console.log(detail_service,service);
-            total_devis = detail_service.prix + total_devis;
+           
+            let detail_service = await getPrixCategorieVoitureByService(
+                voiture_data.categorie,
+                service.service
+            );
+            total_devis += detail_service?.prix || 0;
 
             if (service.avec_produit) {
-                let { ligne_produits, total_produit }= await getProduitsComplets(voiture_data.marque, service);
+                let { ligne_produits, total_produit } = await getProduitsComplets(
+                    voiture_data.marque,
+                    service.service
+                );
 
-                total_devis = total_devis + total_produit; //ajoute le prix total des produits
+                total_devis += total_produit;
 
                 ligne_devis.push({ service_details: detail_service, produits: ligne_produits });
-
             } else {
                 ligne_devis.push({ service_details: detail_service, produits: [] });
             }
         }
+
+
         return { ligne_devis, total_devis };
     } catch (error) {
+        console.error(error);
         throw error;
     }
-}
-// prends le prix de service suivant le categorie de voiture
+};
+
+// **Prend le prix du service suivant la catégorie de voiture**
 const getPrixCategorieVoitureByService = async (categorie, service) => {
     try {
-        return await PrixServiceCategorie.find(categorie, service).populate("service");
+        return await PrixServiceCategorie.findOne({
+            categorie_voiture: toObjectId(categorie),
+            service: toObjectId(service),
+        }).populate("service");
     } catch (error) {
+        console.error(error);
         throw error;
     }
-}
-//prends la liste des produit avec leur produit utiliser par un service suivant les marques
-const getProduitsComplets = async (marque, service) => {
-    let ligne_produits = [];
-    let produit_usages = await getProduitUsedByService(service);
-
-    let total_produit = 0;
-    for (const element of produit_usages) {
-        let temp_prix_unitaire = await getPrixProduit(marque, element.produit._id);
-        console.log((marque, element.produit),temp_prix_unitaire,"fonction getProduitComplets");
-        total_produit = total_produit + (element.quantite * temp_prix_unitaire);
-        ligne_produits.push({
-            produit: element.produit,
-            prix: element.quantite * temp_prix_unitaire,
-            prix_unitaire: temp_prix_unitaire
-        });
-    }
-
-    return { ligne_produits, total_produit };
 };
 
+// **Prend la liste des produits utilisés par un service pour une marque donnée**
+const getProduitsComplets = async (marque, service) => {
+    try {
+        let ligne_produits = [];
+        let produit_usages = await getProduitUsedByService(service);
+        let total_produit = 0;
+        if (produit_usages.length<=0) {
+            return { ligne_produits: null, total_produit: 0 };
+        }
 
-// prends les produits utiliser par un service
+        for (const element of produit_usages) {
+            if (element.produit) {
+                // console.log(marque, element.produit._id);
+                let temp_prix_unitaire = await getPrixProduit(toObjectId(marque), element.produit._id);
+             
+                total_produit += element.quantite * temp_prix_unitaire;
+
+                ligne_produits.push({
+                    produit: element.produit,
+                    prix: element.quantite * temp_prix_unitaire,
+                    prix_unitaire: temp_prix_unitaire,
+                });
+            }
+
+        }
+
+        return { ligne_produits, total_produit };
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+// **Récupère les produits utilisés par un service**
 const getProduitUsedByService = async (service) => {
     try {
-        return UsageProduitService.find({ service }).populate("produit");
+        return await UsageProduitService.find({
+            service: toObjectId(service),
+        }).populate("produit") || [];
     } catch (error) {
+        console.error(error);
         throw error;
     }
 };
-// prends le prix des produits par marque
+
+// **Récupère le prix d’un produit selon la marque**
 const getPrixProduit = async (marque, produit) => {
     try {
-        return await PrixProduitMarque.find({ marque, produit }).select("prix");
+        let result = await PrixProduitMarque.findOne({
+            marque: toObjectId(marque),
+            produit: toObjectId(produit),
+        }).select("prix");
+        
+        return result ? result.prix : 0;
     } catch (error) {
+        console.error(error);
         throw error;
     }
-}
+};
 
-
-exports.Calculate = async (liste_service, voituredata) => {
+// **Export de la fonction principale**
+exports.Calculate = async (nouveau_devis) => {
     try {
-        let { ligne_devis, total_devis } = await getLigneDevis(voituredata, liste_service);
-
-        return {ligne_devis, total_devis};
-
+        let { ligne_devis, total_devis } = await getLigneDevis(
+            nouveau_devis.voiture,
+            nouveau_devis.services
+        );
+        // console.log("final",ligne_devis,total_devis);
+        return { ligne_devis, total_devis };
     } catch (error) {
-
+        console.error(error);
+        throw error;
     }
-}
+};

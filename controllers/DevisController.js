@@ -2,10 +2,10 @@ const DevisService=require("../services/DevisService");
 
 exports.getDevis = async(req,res)=>{
     try {
-        if (!req.body.liste_service || !req.body.voiture_data) {
+        if (!req.body.nouveau_devis.services || !req.body.nouveau_devis.voiture) {
             return res.status(400).json({ success: false, message: "Données manquantes" });
         }
-        let {ligne_devis, total_devis}= DevisService.Calculate(req.body.liste_service,req.body.voiture_data);
+        let {ligne_devis, total_devis}= await DevisService.Calculate(req.body.nouveau_devis);
         res.status(200).json({
             success: true,
             message: "Devis généré avec succès",

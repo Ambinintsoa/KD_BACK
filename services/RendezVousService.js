@@ -4,6 +4,8 @@ const Tache = require('../models/Tache');
 const Utilisateur = require('../models/Utilisateur');
 const Voiture = require('../models/Voiture');
 const Service = require('../models/Service');
+const jwt = require('jsonwebtoken');
+const VoitureService=require('./VoitureService');
 
 // Fonction pour sauvegarder un rendez-vous (rdv)
 exports.save = async (rdv_data, objet_session) => {
@@ -23,7 +25,7 @@ exports.save = async (rdv_data, objet_session) => {
             if (!client) {
                 error_field.push({ field: "client", message: "Client invalide!" });
             }
-        } 
+        }
         // Vérification de la voiture
 
         if (rdv.voiture && mongoose.Types.ObjectId.isValid(rdv.voiture)) {
@@ -31,7 +33,7 @@ exports.save = async (rdv_data, objet_session) => {
             if (!voiture) {
                 error_field.push({ field: "voiture", message: "Voiture invalide!" });
             }
-        } 
+        }
 
         // Si la liste d'erreurs contient des erreurs, on les renvoie
         if (error_field.length > 0) {
@@ -64,7 +66,22 @@ exports.save = async (rdv_data, objet_session) => {
 // Fonction pour sauvegarder le rendez-vous et les tâches associées
 exports.saveRDV = async (req) => {
     const error_field = [];
-    const { taches, ...otherData } = req.body;
+    let client = '';
+    const token = req.header('Authorization');
+
+    if (!token || !token.startsWith('Bearer ')) {
+        return res.status(401).json({ error: 'Permission non accordé' });
+    }
+    try {
+        const token_without_bearer = token.split(' ')[1];
+        const decoded = jwt.verify(token_without_bearer, process.env.SECRET_KEY_ACCESS);
+        client = decoded.userId;
+
+    } catch (error) {
+        throw error;
+    }
+    const { taches, voiture, ...restData } = req.body.request_body;
+    let otherData = { ...restData, client };
 
     // Vérifie que 'taches' est bien un tableau
     if (!Array.isArray(taches)) {
@@ -76,25 +93,30 @@ exports.saveRDV = async (req) => {
     session.startTransaction();  // Démarrer la transaction
 
     try {
+        voiture.client=client;
+        const voiture_inserted = await VoitureService.save(voiture, { session });
+        let otherData = { ...otherData, voiture:voiture_inserted._id };
+
         // Enregistrer le rendez-vous dans la session
         const last_rdv = await exports.save(otherData, { session });
+
         let error_field = []; // Assurez-vous que error_field est défini
         let i = 1;
-        let list=[];
+        let list = [];
 
         taches.map((tacheData) => {
             list.push(tacheData.service);
         });
-        
+
         // Vérification des doublons
         const hasDuplicates = new Set(list).size !== list.length;
-        
+
         if (hasDuplicates) {
             error_field.push({
                 field: `service`,
-                message: `Les services ne doivent pas contenir de doublons!` ,
+                message: `Les services ne doivent pas contenir de doublons!`,
             });
-        } 
+        }
 
         // Créer des objets de tâches à insérer
         const taches_obj = await Promise.all(
@@ -276,7 +298,7 @@ exports.readByMecanicien = async (offset, limit, data) => {
             temp_date.setDate(temp_date.getDate() + 7); // Ajoute 7 jour
             data.date_fin = temp_date;
         }
-        
+
         const searchConditions = {
             mecanicien: data.mecanicien,
             date_heure_debut: {
@@ -451,7 +473,7 @@ exports.updateRDV = async (data) => {
             if (!client) {
                 error_field.push({ field: "client", message: "Client invalide!" });
             }
-        } 
+        }
 
         // Vérification du mecanicien
         if (rdv.mecanicien && mongoose.Types.ObjectId.isValid(rdv.mecanicien)) {
@@ -459,14 +481,14 @@ exports.updateRDV = async (data) => {
             if (!mecanicien) {
                 error_field.push({ field: "mecanicien", message: "Mecanicien invalide!" });
             }
-        } 
+        }
         // Vérification de la voiture
         if (rdv.voiture && mongoose.Types.ObjectId.isValid(rdv.voiture)) {
             const voiture = await Voiture.findOne({ _id: rdv.voiture });
             if (!voiture) {
                 error_field.push({ field: "voiture", message: "Voiture invalide!" });
             }
-        } 
+        }
 
         if (error_field.length > 0) {
             throw { message: "Validation failed", errors: error_field };

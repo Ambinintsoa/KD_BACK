@@ -28,12 +28,12 @@ exports.save = async (rdv_data, objet_session) => {
         }
         // Vérification de la voiture
 
-        if (rdv.voiture && mongoose.Types.ObjectId.isValid(rdv.voiture)) {
-            const voiture = await Voiture.findOne({ _id: rdv.voiture });
-            if (!voiture) {
-                error_field.push({ field: "voiture", message: "Voiture invalide!" });
-            }
-        }
+        // if (rdv.voiture && mongoose.Types.ObjectId.isValid(rdv.voiture)) {
+        //     const voiture = await Voiture.findOne({ _id: rdv.voiture });
+        //     if (!voiture) {
+        //         error_field.push({ field: "voiture", message: "Voiture invalide!" });
+        //     }
+        // }
 
         // Si la liste d'erreurs contient des erreurs, on les renvoie
         if (error_field.length > 0) {
@@ -95,7 +95,7 @@ exports.saveRDV = async (req) => {
     try {
         voiture.client=client;
         const voiture_inserted = await VoitureService.save(voiture, { session });
-        let otherData = { ...otherData, voiture:voiture_inserted._id };
+        otherData = { ...otherData, voiture:voiture_inserted._id };
 
         // Enregistrer le rendez-vous dans la session
         const last_rdv = await exports.save(otherData, { session });

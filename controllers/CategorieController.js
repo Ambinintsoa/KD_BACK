@@ -1,7 +1,8 @@
 const CategorieServiceModel=require("../models/CategorieService");
 const CategorieService=require("../services/CategorieService");
 const ServiceService=require("../services/ServiceService");
-
+const ExcelJS = require('exceljs');
+const fs = require("fs");
 // Code backend (Express)
 exports.save = async (req, res) => {
     try {
@@ -119,7 +120,7 @@ exports.update = async(req,res)=>{
             });
         }
 
-        await CategorieService.update(req.body);
+        await CategorieService.update(req.body);    
         res.status(200).json({ message: "Categorie modifiée avec succès" });
 
     } catch (error) {
@@ -178,5 +179,52 @@ exports.delete = async (req, res) => {
     }
 };
 
+exports.import = async (req, res) => {
+    try {
+        const result = await CategorieService.import(req.file.path);
+// Supprime le fichier après le traitement
+await fs.promises.unlink(req.file.path);
+        if (!result.success) {
+            return res.status(400).json({ errors: result.errors });
+        }
 
+        res.status(200).json({ message: result.message });
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ error: 'Erreur interne du serveur' });
+    }
+};
+exports.export = async (req, res) => {
+    try {
+      // Récupérer tous les éléments depuis la base de données
+      const categories = await CategorieService.export();
+      // Créer un nouveau classeur Excel
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet('Catégories');
 
+      // Définir les colonnes
+      worksheet.columns = [
+        { header: 'nom', key: 'nom', width: 20 },
+      ];
+
+      // Ajouter les données
+      categories.forEach(category => {
+        worksheet.addRow({
+          nom: category.nom_categorie
+        });
+      });
+
+      // Configurer les en-têtes pour le téléchargement
+      res.setHeader(
+        'Content-Type',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      );
+      res.setHeader('Content-Disposition', 'attachment; filename=categories.xlsx');
+
+      // Écrire le fichier dans la réponse
+      await workbook.xlsx.write(res);
+      res.end();
+    } catch (error) {
+      res.status(500).json({ error: 'Erreur lors de l\'exportation : ' + error.message });
+    }
+  }

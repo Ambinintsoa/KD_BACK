@@ -10,13 +10,14 @@ exports.save = async (voitureData,objet_session) => {
 
         if (await Voiture.countDocuments({ immatriculation: voiture.immatriculation.trim() }) < 1) {
             voiture.immatriculation = voiture.immatriculation.trim();
-            voiture.marque = voiture.marque.trim();
-            voiture.modele = voiture.modele.trim();
-            voiture.categorie = voiture.categorie.trim();
+            // voiture.marque = voiture.marque.trim();
+            // voiture.modele = voiture.modele.trim();
+            // voiture.categorie = voiture.categorie.trim();
 
             await voiture.save(objet_session);
             return voiture;
         } else {
+            return voiture;
             throw new Error("Il y a déjà une voiture portant ce numéro d'immatriculation");
         }
 

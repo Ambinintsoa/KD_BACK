@@ -191,4 +191,48 @@ exports.export = async (req, res) => {
       .status(500)
       .json({ error: "Erreur lors de l'exportation : " + error.message });
   }
+  
 };
+exports.getProduits=async (req, res)=> {
+  try {
+      const produits = await ProduitService.getAllProduits();
+      res.json(produits);
+  } catch (error) {
+      res.status(500).json({ error: error.message });
+  }
+}
+
+exports.getProduitsByService= async(req, res)=> {
+  try {
+      const produits = await ProduitService.getProduitsByService(req.params.serviceId);
+      res.json(produits);
+  } catch (error) {
+      res.status(500).json({ error: error.message });
+  }
+}
+
+exports.addProduitToService= async(req, res) =>{
+  try {
+      const { produitId, quantite } = req.body;
+      const result = await ProduitService.addProduitToService(
+          req.params.serviceId,
+          produitId,
+          quantite
+      );
+      res.json(result);
+  } catch (error) {
+      res.status(500).json({ error: error.message });
+  }
+}
+
+exports.removeProduitFromService = async(req, res) =>{
+  try {
+      const result = await ProduitService.removeProduitFromService(
+          req.params.serviceId,
+          req.body.produitId
+      );
+      res.json(result);
+  } catch (error) {
+      res.status(500).json({ error: error.message });
+  }
+}

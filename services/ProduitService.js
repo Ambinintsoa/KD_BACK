@@ -1,4 +1,5 @@
 const Produit = require("../models/Produit");
+const UsageProduitService = require("../models/UsageProduitService");
 const ExcelJS = require('exceljs');
 // enregistre un produit
 exports.save = async (produitData) => {
@@ -157,4 +158,37 @@ exports.import = async (filePath) => {
 //list of produits to export
 exports.export=async()=>{
     return await Produit.find({'statut': 0});
+}
+exports.getAllProduits= async()=> {
+  return await Produit.find();
+}
+
+exports.getProduitsByService= async(serviceId) =>{
+  return await UsageProduitService.find({ service: serviceId })
+      .populate('produit');
+}
+
+exports.addProduitToService = async(serviceId, produitId, quantite)=> {
+  const existing = await UsageProduitService.findOne({ 
+      service: serviceId, 
+      produit: produitId 
+  });
+  
+  if (existing) {
+      existing.quantite += quantite;
+      return await existing.save();
+  }
+  
+  return await UsageProduitService.create({
+      service: serviceId,
+      produit: produitId,
+      quantite
+  });
+}
+
+exports.removeProduitFromService= async(serviceId, produitId)=> {
+  return await UsageProduitService.deleteOne({
+      service: serviceId,
+      produit: produitId
+  });
 }

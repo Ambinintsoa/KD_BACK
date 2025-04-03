@@ -22,7 +22,7 @@ exports.saveDetailsFacture = async (details_facture_object, id_facture, session_
             for (const produit of details_facture_object.produits) {
                 let temp_produit = new DetailsFacture({
                     prix: produit.prix,
-                    quantite: produit.quantite, 
+                    quantite: produit.quantite,
                     facture: id_facture,
                     produit: produit.produit._id
                 });
@@ -72,3 +72,42 @@ const getNumeroFacture = async () => {
         throw error;
     }
 };
+
+exports.readFactureByRendezVous = async (rendez_vous) => {
+
+    try {
+        let res = await Facture.find({ rendez_vous });
+
+        return res;
+    } catch (error) {
+        console.error("Erreur lors de la récupération du numéro de facture :", error);
+        throw error;
+    }
+}
+exports.readDetailFactureByFacture = async (id_facture) => {
+
+    try {
+        let res = await DetailsFacture.find({ facture: id_facture })
+            .populate("service")
+            .populate("produit");
+
+        return res;
+
+    } catch (error) {
+        console.error("Erreur lors de la récupération du numéro de facture :", error);
+        throw error;
+    }
+}
+exports.readFactureByClient = async (client) => {
+
+    try {
+        let res = await Facture.find({ client });
+
+        return res;
+    } catch (error) {
+        console.error("Erreur lors de la récupération du numéro de facture :", error);
+        throw error;
+    }
+}
+
+

@@ -13,7 +13,6 @@ exports.save = async (rdv_data, objet_session) => {
     const error_field = [];
     try {
         const rdv = new RendezVous(rdv_data);
-        console.log(rdv.date_heure_debut, " date heure debut");
 
         // Vérification de la date
         if (rdv.date_heure_debut < new Date()) {

@@ -106,13 +106,6 @@ exports.update = async (req, res) => {
       nom_service: serviceData.nom_service.trim(),
       _id: { $ne: serviceData._id },
     });
-
-    if (existingService) {
-      return res.status(400).json({
-        field: "nom_service",
-        message: "Il y a déjà un service portant ce nom",
-      });
-    }
     await ServiceService.update(req.body);
     res.status(200).json({ message: "Service modifié avec succès" });
   } catch (error) {

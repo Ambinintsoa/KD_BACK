@@ -28,6 +28,11 @@ productRouter.post('/stock-entry',  [verifyToken], upload.single('invoice'), Ent
 productRouter.get('/stock-entries',  [verifyToken], EntreeStockController.listStockEntries);
 productRouter.delete('/stock-entry/:id', [verifyToken], EntreeStockController.deleteStockEntry); //
 productRouter.delete('/reassort/:id', [verifyToken], DemandeProduitController.delete); //
+
+productRouter.get('/all',[verifyToken,RoleMiddleware.adminRole], ProduitController.getProduits);
+productRouter.get('/service/:serviceId',[verifyToken,RoleMiddleware.adminRole], ProduitController.getProduitsByService);
+productRouter.post('/service/:serviceId',[verifyToken,RoleMiddleware.adminRole], ProduitController.addProduitToService);
+productRouter.delete('/service/:serviceId',[verifyToken,RoleMiddleware.adminRole], ProduitController.removeProduitFromService);
 module.exports = productRouter;
 
 

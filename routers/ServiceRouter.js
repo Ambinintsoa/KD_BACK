@@ -14,7 +14,7 @@ serviceRouter.get("",[verifyToken], ServiceController.read);
 serviceRouter.get("/promotions", ServiceController.allPromotions);
 serviceRouter.get("/search/:page",[verifyToken], ServiceController.readBy);
 serviceRouter.get("/id/:id",[verifyToken], ServiceController.readById);
-serviceRouter.get("/serviceCategorie",[verifyToken], ServiceController.getAllServicesByCategories);
+serviceRouter.get("/serviceCategorie", ServiceController.getAllServicesByCategories);
 
 
 serviceRouter.post("/import",upload.single('file'),[verifyToken], ServiceController.import);

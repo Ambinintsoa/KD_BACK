@@ -31,3 +31,5 @@ productRouter.delete('/reassort/:id', [verifyToken], DemandeProduitController.de
 module.exports = productRouter;
 
 
+
+

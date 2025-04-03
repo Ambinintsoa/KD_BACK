@@ -6,6 +6,7 @@ const Voiture = require('../models/Voiture');
 const Service = require('../models/Service');
 const jwt = require('jsonwebtoken');
 const VoitureService=require('./VoitureService');
+const FactureService=require('./FactureService');
 
 // Fonction pour sauvegarder un rendez-vous (rdv)
 exports.save = async (rdv_data, objet_session) => {
@@ -47,6 +48,7 @@ exports.save = async (rdv_data, objet_session) => {
 
         // Sauvegarder le rendez-vous dans la session
         await rdv.save(objet_session);
+
         return rdv;
 
     } catch (error) {
@@ -80,13 +82,14 @@ exports.saveRDV = async (req) => {
     } catch (error) {
         throw error;
     }
-    const { taches, voiture, ...restData } = req.body.request_body;
+    const { taches, voiture, devis_object, ...restData } = req.body.request_body;
     let otherData = { ...restData, client };
-
+    
     // Vérifie que 'taches' est bien un tableau
     if (!Array.isArray(taches)) {
         throw new Error("'taches' doit être un tableau");
     }
+
 
     const session = await mongoose.startSession();  // Démarrer une session
 
@@ -147,6 +150,9 @@ exports.saveRDV = async (req) => {
             })
         );
 
+       //enregistrer un facture lier par le rendez_vous
+        await FactureService.saveFacture(devis_object,client,last_rdv._id,session);
+
         // Si des erreurs ont été détectées, lever une exception avant de continuer
         if (error_field.length > 0) {
             throw { message: "Validation failed", errors: error_field };
@@ -170,7 +176,7 @@ exports.saveRDV = async (req) => {
 
         console.error(error);
         if (error.errors) {
-            error.errors.concat(error_field);
+            // error.errors.concat(error_field);
             throw { message: error.message, errors: error.errors };
         } else {
             // Gestion d'autres erreurs imprévues

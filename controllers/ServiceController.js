@@ -235,6 +235,7 @@ exports.export = async (req, res) => {
 exports.getAllServicesByCategories = async (req, res) => {
   try {
       let resultat=await ServiceService.getAllServicesByCategories();
+      console.log(resultat);
       res.status(201).json({ resultat:resultat });
 
   } catch (error) {

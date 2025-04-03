@@ -92,33 +92,29 @@ exports.login = async (req, res) => {
     }
 }
 // donne la liste des utilisateurs avec pagination
-exports.read= async (req,res)=>{
+exports.read = async (req, res) => {
     try {
-        let page=req.params.page || 1;
-        let limit=10;
-        const offset = (page - 1) * limit;
-
-        let user_list= await userService.read(offset,limit);
-        res.status(201).json({ users: user_list });
-
+      let page = parseInt(req.query.page) || 1;
+      let limit = parseInt(req.query.limit) || 10;
+      let search = req.query.search || '';
+      let sortBy = req.query.sortBy || 'nom';
+      let sortOrder = req.query.orderBy || 'asc'; // Utiliser "orderBy" comme dans votre exemple
+  
+      const { utilisateurs, total } = await userService.read(page, limit, search, sortBy, sortOrder);
+  
+      res.status(200).json({
+        utilisateurs,
+        currentPage: page,
+        totalPages: Math.ceil(total / limit),
+        totalItems: total
+      });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: error.message });
+      console.error(error);
+      res.status(500).json({ error: error.message });
     }
-}
+  };
 
-//modifie les données  de l'utilisateur
-exports.update=async (req,res)=>{
-    try {
-       
-        await userService.update(req.body);
-        res.status(201).json({ message: "Utilisateur modifié avec succès" });
-        
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: error.message });
-    }
-}
+
 
 exports.refreshToken = async (req, res) => {
     const refreshToken = req.body.refresh;
@@ -145,5 +141,38 @@ exports.refreshToken = async (req, res) => {
     }
   }
 
-
+  exports.getUtilisateurById = async (req, res) => {
+    try {
+      const utilisateur = await userService.getUtilisateurById(req.params.id);
+      res.status(200).json(utilisateur);
+    } catch (error) {
+      res.status(error.message === 'Utilisateur non trouvé' ? 404 : 500).json({ message: error.message });
+    }
+  };
   
+  exports.createUtilisateur = async (req, res) => {
+    try {
+      const utilisateur = await userService.createUtilisateur(req.body);
+      res.status(201).json(utilisateur);
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  };
+  
+  exports.updateUtilisateur = async (req, res) => {
+    try {
+      const utilisateur = await userService.updateUtilisateur(req.params.id, req.body);
+      res.status(200).json(utilisateur);
+    } catch (error) {
+      res.status(error.message === 'Utilisateur non trouvé' ? 404 : 400).json({ message: error.message });
+    }
+  };
+  
+  exports.deleteUtilisateur = async (req, res) => {
+    try {
+      const result = await userService.deleteUtilisateur(req.params.id);
+      res.status(200).json(result);
+    } catch (error) {
+      res.status(error.message === 'Utilisateur non trouvé' ? 404 : 500).json({ message: error.message });
+    }
+}

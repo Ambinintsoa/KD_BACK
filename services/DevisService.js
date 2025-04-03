@@ -79,6 +79,7 @@ const getProduitsComplets = async (marque, service) => {
 
                 ligne_produits.push({
                     produit: element.produit,
+                    quantite:element.quantite,
                     prix: element.quantite * temp_prix_unitaire,
                     prix_unitaire: temp_prix_unitaire,
                 });

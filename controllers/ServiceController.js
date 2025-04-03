@@ -47,6 +47,7 @@ exports.save = async (req, res) => {
   }
 };
 
+  
 exports.read = async (req, res) => {
   try {
     let page = parseInt(req.query.page) || 1;
@@ -105,13 +106,6 @@ exports.update = async (req, res) => {
       nom_service: serviceData.nom_service.trim(),
       _id: { $ne: serviceData._id },
     });
-
-    if (existingService) {
-      return res.status(400).json({
-        field: "nom_service",
-        message: "Il y a déjà un service portant ce nom",
-      });
-    }
     await ServiceService.update(req.body);
     res.status(200).json({ message: "Service modifié avec succès" });
   } catch (error) {
@@ -230,3 +224,15 @@ exports.export = async (req, res) => {
       .json({ error: "Erreur lors de l'exportation : " + error.message });
   }
 };
+
+exports.getAllServicesByCategories = async (req, res) => {
+  try {
+      let resultat=await ServiceService.getAllServicesByCategories();
+      console.log(resultat);
+      res.status(201).json({ resultat:resultat });
+
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: error.message });
+  }
+}

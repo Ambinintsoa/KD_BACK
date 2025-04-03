@@ -1,19 +1,23 @@
 const Voiture = require('../models/Voiture');
 
 // enregistre un voiture
-exports.save = async (voitureData) => {
+exports.save = async (voitureData,objet_session) => {
     try {
         const voiture = new Voiture(voitureData);
-        if (!voiture.immatriculation || !voiture.marque || !voiture.modele || !voiture.client) throw new Error("Le numero d'immatriculation,la marque et modèle de la voiture sont obligatoires !");
+        console.log(voitureData,voiture.immatriculation,voiture.marque ,voiture.categorie ,voiture.client,"check");
+        if (!voiture.immatriculation || !voiture.marque || !voiture.categorie || !voiture.client) throw new Error("Le numero d'immatriculation,la marque et categorie de la voiture sont obligatoires !");
 
 
         if (await Voiture.countDocuments({ immatriculation: voiture.immatriculation.trim() }) < 1) {
             voiture.immatriculation = voiture.immatriculation.trim();
-            voiture.marque = voiture.marque.trim();
-            voiture.modele = voiture.modele.trim();
+            // voiture.marque = voiture.marque.trim();
+            // voiture.modele = voiture.modele.trim();
+            // voiture.categorie = voiture.categorie.trim();
 
-            await voiture.save();
+            await voiture.save(objet_session);
+            return voiture;
         } else {
+            return voiture;
             throw new Error("Il y a déjà une voiture portant ce numéro d'immatriculation");
         }
 

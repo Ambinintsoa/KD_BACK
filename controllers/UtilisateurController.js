@@ -61,8 +61,8 @@ exports.register = async (req, res) => {
             }
         }
 
-        if (role &&!['user', 'admin'].includes(role)) {
-            errors.push({ field: 'role', message: 'Le rôle doit être user ou admin' });
+        if (role &&!['user', 'admin','mecanicien'].includes(role)) {
+            errors.push({ field: 'role', message: 'Le rôle doit être user ou admin ou mecanicien' });
         }
 
         // Si des erreurs sont détectées, renvoyer le tableau d'erreurs avec un statut 400

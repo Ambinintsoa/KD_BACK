@@ -8,7 +8,7 @@ CategorieVoitureRouter.post("/save",[verifyToken,RoleMiddleware.adminRole], Cate
 CategorieVoitureRouter.put("/update",[verifyToken,RoleMiddleware.adminRole], CategorieVoitureController.update);
 CategorieVoitureRouter.delete("/:id",[verifyToken,RoleMiddleware.adminRole], CategorieVoitureController.delete);
 
-CategorieVoitureRouter.get("/:page",[verifyToken], CategorieVoitureController.read);
+CategorieVoitureRouter.get("/:page", CategorieVoitureController.read);
 CategorieVoitureRouter.get("/search/:page",[verifyToken], CategorieVoitureController.readBy);
 CategorieVoitureRouter.get("/id/:id",[verifyToken], CategorieVoitureController.readById);
 

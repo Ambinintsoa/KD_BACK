@@ -8,7 +8,7 @@ marqueRouter.post("/save",[verifyToken,RoleMiddleware.adminRole], MarqueControll
 marqueRouter.put("/update",[verifyToken,RoleMiddleware.adminRole], MarqueController.update);
 marqueRouter.delete("/:id",[verifyToken,RoleMiddleware.adminRole], MarqueController.delete);
 
-marqueRouter.get("/:page",[verifyToken], MarqueController.read);
+marqueRouter.get("/:page", MarqueController.read);
 marqueRouter.get("/search/:page",[verifyToken], MarqueController.readBy);
 marqueRouter.get("/id/:id",[verifyToken], MarqueController.readById);
 

@@ -1,5 +1,5 @@
 const DemandeProduitService = require('../services/DemandeProduitService');
-
+const { getIo } = require('../socket');
 class DemandeProduitController {
   static async requestReassort(req, res) {
     try {
@@ -10,6 +10,21 @@ class DemandeProduitController {
       }
 
       const result = await DemandeProduitService.createReassortRequest(entries, userId);
+      // Émettre une notification aux admins via WebSocket
+      const createdDemandes = result.data; // Tableau des demandes créées
+      createdDemandes.forEach(savedRequest => {
+        const io = getIo(); // Récupérer l'instance de io
+  const request = {
+    _id: savedRequest._id,
+    productName: savedRequest.productName || entries.find(e => e.produitId === savedRequest.produit.toString())?.productName || 'Produit inconnu', // À ajuster selon votre modèle
+    quantity: savedRequest.quantite_demande,
+    requestedBy: savedRequest.utilisateur,
+    createdAt: savedRequest.date
+  };
+
+  io.to('admin').emit('newRestockRequest', request);
+  console.log('Notification envoyée:', request);
+      });
       res.status(201).json(result);
     } catch (error) {
       res.status(500).json({ error: error.message });

@@ -65,16 +65,38 @@ exports.login = async (data) => {
 }
 
 // lit tous les utilisateurs
-exports.read=async(offset,limit)=>{
+exports.read = async (page = 1, limit = 10, search = '', sortBy = 'nom', sortOrder = 'asc') => {
     try {
-        console.log(offset,limit);
-        return await Utilisateur.find().skip(offset).limit(limit);
+      // Construire les critères de recherche
+      const query = search
+        ? {
+            $or: [
+              { nom: { $regex: search, $options: 'i' } }, // Recherche insensible à la casse sur le nom
+              { email: { $regex: search, $options: 'i' } }, // Recherche sur l'email
+              { prenom: { $regex: search, $options: 'i' } } // Recherche sur le prénom
+            ]
+          }
+        : {};
+  
+      // Définir l'ordre de tri
+      const sort = {};
+      sort[sortBy] = sortOrder === 'desc' ? -1 : 1;
+  
+      // Récupérer les utilisateurs avec pagination
+      const utilisateurs = await Utilisateur.find(query)
+        .select('-mot_de_passe') // Exclure le mot de passe
+        .sort(sort)
+        .skip((page - 1) * limit)
+        .limit(limit);
+  
+      // Compter le nombre total d'utilisateurs correspondant à la recherche
+      const total = await Utilisateur.countDocuments(query);
+  
+      return { utilisateurs, total };
     } catch (error) {
-        console.error(error);
-        throw error;
+      throw new Error('Erreur lors de la récupération des utilisateurs');
     }
-}
-
+  };
 // modifie les utilisateurs
 exports.update=async(userdata)=>{
     try {
@@ -104,6 +126,64 @@ exports.update=async(userdata)=>{
         console.error(error);
         throw error;
     }
+
 }
+    
+      // Récupérer un utilisateur par ID
+      exports.getUtilisateurById=async(id) =>{
+        try {
+          const utilisateur = await Utilisateur.findById(id).select('-mot_de_passe');
+          if (!utilisateur) throw new Error('Utilisateur non trouvé');
+          return utilisateur;
+        } catch (error) {
+          throw error.message === 'Utilisateur non trouvé' ? error : new Error('Erreur lors de la récupération de l’utilisateur');
+        }
+      }
+    
+      // Créer un utilisateur
+      exports.createUtilisateur= async(data) =>{
+        try {
+          const { mot_de_passe, ...rest } = data;
+          const hashedPassword = await bcrypt.hash(mot_de_passe, 10);
+          const utilisateur = new Utilisateur({
+            ...rest,
+            mot_de_passe: hashedPassword
+          });
+          return await utilisateur.save();
+        } catch (error) {
+          throw new Error('Erreur lors de la création de l’utilisateur');
+        }
+      }
+    
+      // Mettre à jour un utilisateur
+      exports.updateUtilisateur= async(id, data)=> {
+        try {
+          const { mot_de_passe, ...rest } = data;
+          const updateData = { ...rest };
+          if (mot_de_passe) {
+            updateData.mot_de_passe = await bcrypt.hash(mot_de_passe, 10);
+          }
+          const utilisateur = await Utilisateur.findByIdAndUpdate(
+            id,
+            updateData,
+            { new: true }
+          ).select('-mot_de_passe');
+          if (!utilisateur) throw new Error('Utilisateur non trouvé');
+          return utilisateur;
+        } catch (error) {
+          throw error.message === 'Utilisateur non trouvé' ? error : new Error('Erreur lors de la mise à jour de l’utilisateur');
+        }
+      }
+    
+      // Supprimer un utilisateur
+      exports.deleteUtilisateur= async(id)=> {
+        try {
+          const utilisateur = await Utilisateur.findByIdAndDelete(id);
+          if (!utilisateur) throw new Error('Utilisateur non trouvé');
+          return { message: 'Utilisateur supprimé' };
+        } catch (error) {
+          throw error.message === 'Utilisateur non trouvé' ? error : new Error('Erreur lors de la suppression de l’utilisateur');
+        }
+      }
 
 

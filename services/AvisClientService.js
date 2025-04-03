@@ -1,104 +1,96 @@
 const AvisClient = require('../models/AvisClient');
-const Utilisateur = require("../models/Utilisateur");
-const { shuffle } = require('lodash'); 
 
-// enregistre une avis_client
-exports.save = async (avis_clientData) => {
+class AvisClientService {
+  static async createAvis(avisData) {
     try {
-        const avis_client = new AvisClient(avis_clientData);
-        if (!avis_client.client || !avis_client.score || !avis_client.avis) throw new Error("L'utilisateur, le score et l\'avis sont obligatoires !");
-
-        if (! await Utilisateur.findOne({ _id: avis_client.client })) throw new Error("L'utilisateur n'existe pas!");
-
-        if (avis_client.mecanicien) {
-            if (! await AvisClient.findOne({ _id: avis_client.mecanicien })) throw new Error("Le mecanicien n'existe pas!");
-        }
-
-
-        avis_client.avis = avis_client.avis.trim();
-        await avis_client.save();
-
-
+      const avis = new AvisClient(avisData);
+      const savedAvis = await avis.save();
+      return { success: true, message: 'Avis créé', data: savedAvis };
     } catch (error) {
-        console.error(error);
-        throw error;
+      throw new Error(`Erreur lors de la création de l’avis : ${error.message}`);
     }
-}
-// liste de avis_clients avec pagination
-exports.read = async (offset, limit) => {
+  }
+
+  static async getAvis({ page = 1, limit = 10, search = '', sortBy = 'date', orderBy = 'desc' }) {
     try {
-        return await AvisClient.find().skip(offset).limit(limit).populate("client");
-    } catch (error) {
-        console.error(error);
-        throw error;
-    }
-}
-// liste de avis_clients avec pagination et filtre => condition "et"
-exports.readBy = async (offset, limit, data) => {
-    try {
-        return await AvisClient.find(data).skip(offset).limit(limit).populate("client");
-    } catch (error) {
-        console.error(error);
-        throw error;
-    }
-}
-// liste de 3 avis_clients publié en random
-exports.readRandom = async (limit) => {
-    try {
-        const avisClients = await AvisClient.find({ statut: 1 }).populate("client").sort({createdAt:-1}).limit(20);
-        
-        // Mélanger les avis de manière aléatoire
-        const avisAleatoires = shuffle(avisClients).slice(0, limit+1); // Mélange et prend les 3 premiers
+      const query = search ? { avis: { $regex: search, $options: 'i' } } : {};
+      const sortOrder = orderBy === 'asc' ? 1 : -1;
 
-        return avisAleatoires;
+      const avisList = await AvisClient
+        .find(query)
+        .populate('client', 'nom')
+        .populate('mecanicien', 'nom')
+        .sort({ [sortBy]: sortOrder })
+        .skip((page - 1) * limit)
+        .limit(limit);
+
+      const totalItems = await AvisClient.countDocuments(query);
+
+      return {
+        avis: avisList,
+        totalItems,
+        totalPages: Math.ceil(totalItems / limit),
+        currentPage: page
+      };
     } catch (error) {
-        console.error(error);
-        throw error;
+      throw new Error(`Erreur lors de la récupération des avis : ${error.message}`);
     }
-}
-// liste de avis_clients avec pagination trier par score dans un ordre decroissant "
-exports.readByScoreDESC = async (offset, limit, value) => {
+  }
+
+  static async validateAvis(avisId) {
     try {
-        return await AvisClient.find({ score: { $gte: value } }).sort({ age: -1 }).skip(offset).limit(limit);// -1 pour décroissant
+      const avis = await AvisClient.findByIdAndUpdate(
+        avisId,
+        { est_valide: true, statut: 1 }, // Valider et publier
+        { new: true }
+      );
+      if (!avis) throw new Error('Avis non trouvé');
+      return { success: true, message: 'Avis validé et publié', data: avis };
     } catch (error) {
-        console.error(error);
-        throw error;
+      throw new Error(`Erreur lors de la validation de l’avis : ${error.message}`);
     }
-}
+  }
 
-//retourne une avis_client a partir de son id
-exports.readById = async (id) => {
+  static async deleteAvis(avisId) {
     try {
-        return await AvisClient.findOne({ _id: id }).populate("client");
+      const avis = await AvisClient.findByIdAndDelete(avisId);
+      if (!avis) throw new Error('Avis non trouvé');
+      return { success: true, message: 'Avis supprimé' };
     } catch (error) {
-        console.error(error);
-        throw error;
+      throw new Error(`Erreur lors de la suppression de l’avis : ${error.message}`);
     }
-}
-// modifie le statut Obliger d'avoir _id
-exports.updateStatut = async (id, statut) => {
+  }
+  static async getValidatedAvisRandom(limit = 5) {
     try {
-        if (!id || !statut ) throw new Error("L'id et le statut sont obligatoires !");
+      const avisList = await AvisClient
+        .aggregate([
+          { $match: { est_valide: true, statut: 1 } }, // Filtrer les avis validés et publiés
+          { $sample: { size: limit } }, // Sélectionner aléatoirement 'limit' éléments
+          {
+            $lookup: {
+              from: 'utilisateurs',
+              localField: 'client',
+              foreignField: '_id',
+              as: 'client'
+            }
+          },
+          { $unwind: { path: '$client', preserveNullAndEmptyArrays: true } },
+          {
+            $lookup: {
+              from: 'utilisateurs',
+              localField: 'mecanicien',
+              foreignField: '_id',
+              as: 'mecanicien'
+            }
+          },
+          { $unwind: { path: '$mecanicien', preserveNullAndEmptyArrays: true } }
+        ]);
 
-        const initial_avis=await AvisClient.findOne({ _id: id });
-
-        if (! await initial_avis) throw new Error("L'avis client n'existe pas!");
-
-        initial_avis.statut = statut; // Mise à jour de l'attribut
-        await initial_avis.save(); // Sauvegarde les modifications
+      return { avis: avisList };
     } catch (error) {
-        console.error(error);
-        throw error;
+      throw new Error(`Erreur lors de la récupération des avis validés : ${error.message}`);
     }
+  }
 }
 
-//supprime une avis_client a partir de l'id
-exports.delete = async (id) => {
-    try {
-        const avis_clientSupprime = await AvisClient.findByIdAndDelete(id);
-        console.log(avis_clientSupprime); // Affiche le avis_client supprimé
-    } catch (error) {
-        console.error(error);
-        throw error;
-    }
-}
+module.exports = AvisClientService;

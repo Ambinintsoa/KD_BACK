@@ -29,14 +29,16 @@ exports.save = async (serviceData) => {
 // liste de services avec pagination
 exports.read = async (page, limit, search, sortBy, sortOrder) => {
     try {
-        const query = search
-        ? {
-            $or: [
-              { category_name: { $regex: search, $options: "i" } },
-              { nom_service: { $regex: search, $options: "i" } }
-            ]
-          }
-        : {};
+      const query = search
+      ? {
+          $or: [
+            { category_name: { $regex: search, $options: "i" } },
+            { nom_service: { $regex: search, $options: "i" } }
+          ],
+          statut: 0
+        }
+      : { statut: 0 };
+    
     
     const sortOption = {};
     sortOption[sortBy] = sortOrder === "desc" ? -1 : 1; // Tri ascendant ou descendant
@@ -47,7 +49,6 @@ exports.read = async (page, limit, search, sortBy, sortOrder) => {
     const services = await Service.find(query)
       .collation({ locale: "fr", strength: 2 }) // Collation pour tri insensible à la casse
       .sort(sortOption)
-      .where("statut", 0)
       .skip((page - 1) * limit)
       .limit(limit)
       .populate("categorie_service", "nom_categorie")

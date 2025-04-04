@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 const SECRET_KEY = process.env.SECRET_KEY_ACCESS || 'votre_clé_secrète_par_défaut';
-const FRONTEND_URL = process.env.FRONTEND_URL || 'votre_clé_secrète_par_défaut';
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:4200';
 
 let io;
 
@@ -11,7 +11,7 @@ function initializeSocket(server) {
     io = socketIo(server, {
         cors: {
           origin:FRONTEND_URL, // Autoriser l'origine Angular
-          methods: ['GET', 'POST'], // Méthodes HTTP autorisées
+          methods: ['GET', 'POST','PUT'], // Méthodes HTTP autorisées
           credentials: true // Si vous utilisez withCredentials
         }
       });

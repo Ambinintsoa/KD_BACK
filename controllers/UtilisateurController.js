@@ -113,7 +113,27 @@ exports.read = async (req, res) => {
       res.status(500).json({ error: error.message });
     }
   };
-
+  exports.readBy = async (req, res) => {
+    try {
+      let page = parseInt(req.query.page) || 1;
+      let limit = parseInt(req.query.limit) || 10;
+      let search = req.query.search || '';
+      let sortBy = req.query.sortBy || 'nom';
+      let sortOrder = req.query.orderBy || 'asc'; // Utiliser "orderBy" comme dans votre exemple
+  
+      const { utilisateurs, total } = await userService.readBy(page, limit, search, sortBy, sortOrder);
+  
+      res.status(200).json({
+        utilisateurs,
+        currentPage: page,
+        totalPages: Math.ceil(total / limit),
+        totalItems: total
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: error.message });
+    }
+  };
 
 
 exports.refreshToken = async (req, res) => {

@@ -21,7 +21,7 @@ exports.saveRDV = async (req, res) => {
 exports.update = async (req, res) => {
 
     try {
-        await RendezVousService.updateRDV(req);
+        await RendezVousService.updateRDV(req.body);
         
         res.status(201).json({ message: "Modification réussie" });
     } catch (error) {
@@ -56,7 +56,7 @@ exports.assignRDV = async (req, res) => {
 exports.read = async (req, res) => {
 
     try {
-        let page=req.params.page || 1;
+        let page= 1;
         let limit=10;
         const offset = (page - 1) * limit;
         const rendezvous=await RendezVousService.read(offset,limit);

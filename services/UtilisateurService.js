@@ -73,7 +73,8 @@ exports.read = async (page = 1, limit = 10, search = '', sortBy = 'nom', sortOrd
             $or: [
               { nom: { $regex: search, $options: 'i' } }, // Recherche insensible à la casse sur le nom
               { email: { $regex: search, $options: 'i' } }, // Recherche sur l'email
-              { prenom: { $regex: search, $options: 'i' } } // Recherche sur le prénom
+              { prenom: { $regex: search, $options: 'i' } }, // Recherche sur le prénom
+              { role: { $regex: search, $options: 'i' } }
             ]
           }
         : {};

@@ -3,6 +3,7 @@ const Paiement = require('../models/Paiement');
 exports.save = async (paiement_data) => {
     const error_field = [];
     try {
+        
         const paiement = new Paiement(paiement_data);
         if (!paiement.facture) {
             error_field.push({ field: "facture", message: "La facture est obligatoire!" });

@@ -39,6 +39,7 @@ exports.update = async (req, res) => {
 exports.assignRDV = async (req, res) => {
 
     try {
+        console.log(req.body);
         await RendezVousService.assignRDV(req.body);
         
         res.status(201).json({ message: "Assignation réussie" });

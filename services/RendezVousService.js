@@ -296,7 +296,6 @@ exports.readById = async (id) => {
 // liste de tous les rendez-vous par mecanicien entre deux dates
 exports.readByMecanicien = async (offset, limit, data) => {
     try {
-        // console.log(new Date(data.date_debut),new Date(data.date_fin));
         if (!data.date_debut) {
             data.date_debut = new Date();
         }
@@ -333,7 +332,6 @@ exports.readByStatus = async (offset, limit, data) => {
         const searchConditions = {
             statut: data.statut
         };
-        console.log(data);
         return await RendezVous.find(searchConditions).
             skip(offset).
             limit(limit).
@@ -410,7 +408,6 @@ exports.getMecanicienDisponible = async (offset, limit, data) => {
             };
         }
 
-        console.log(condition);
         if (error_field.length > 0) {
             throw { message: "Validation failed", errors: error_field };
         }
@@ -428,7 +425,6 @@ exports.getMecanicienDisponible = async (offset, limit, data) => {
                 list_meca_pris.push(meca.mecanicien._id); // On récupère l'id du mécanicien
             }
         });
-        console.log(list_meca_pris);
         // Recherche des mécaniciens disponibles (qui ne sont pas dans list_meca_pris)
         let mecanicien_disponible = await Utilisateur.find({
             _id: { $nin: list_meca_pris }, role: "mecanicien"// $nin pour sélectionner les utilisateurs dont l'id n'est pas dans la liste

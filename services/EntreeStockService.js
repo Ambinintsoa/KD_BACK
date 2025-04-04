@@ -128,7 +128,7 @@ class EntreeStockService {
             throw new Error('Entrée de stock non trouvée');
           }
           if (entry.public_id) { // Supposez que vous avez stocké le public_id
-            await cloudinary.uploader.destroy(entry.public_id, { resource_type: 'raw' });
+            await cloudinary.uploader.destroy(entry.facture_url, { resource_type: 'raw' });
           }
           await StockProduit.findByIdAndDelete(entryId);
           return { success: true, message: 'Entrée de stock et fichier supprimés' };

@@ -54,10 +54,8 @@ exports.read = async (page, limit, search, sortBy, sortOrder) => {
       .set("strictPopulate", false);
 
     const total = await Service.countDocuments(query);
-    console.log(services);
     return { services, total };
   } catch (error) {
-    console.log(error.message);
     throw new Error("Erreur lors de la récupération des services");
   }
 };
@@ -101,7 +99,6 @@ exports.readById = async (id) => {
 exports.update = async (data) => {
   try {
     const service = new Service(data);
-    console.log(service.nom_service);
     const initial_service = await Service.findOne({ _id: service._id });
 
     if (!initial_service) throw new Error("Aucun service correspondant !");
@@ -288,7 +285,6 @@ exports.import = async (filePath) => {
       return { success: false, errors };
     }
 
-    console.log("Données à insérer final :", services);
 
     await Service.insertMany(services); // Ajout de `await` pour s'assurer de l'insertion
 

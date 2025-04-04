@@ -4,7 +4,6 @@ const Voiture = require('../models/Voiture');
 exports.save = async (voitureData,objet_session) => {
     try {
         const voiture = new Voiture(voitureData);
-        console.log(voitureData,voiture.immatriculation,voiture.marque ,voiture.categorie ,voiture.client,"check");
         if (!voiture.immatriculation || !voiture.marque || !voiture.categorie || !voiture.client) throw new Error("Le numero d'immatriculation,la marque et categorie de la voiture sont obligatoires !");
 
 
@@ -80,7 +79,6 @@ exports.update = async (data) => {
 exports.delete = async (id) => {
     try {
         const voitureSupprime = await Voiture.findByIdAndDelete(id);
-        console.log(voitureSupprime); // Affiche le voiture supprimé
     } catch (error) {
         console.error(error);
         throw error;

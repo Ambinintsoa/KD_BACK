@@ -1,9 +1,9 @@
 const Facture = require("../models/Facture");
+const Paiement = require("../models/Paiement");
 const DetailsFacture = require("../models/DetailsFacture");
 
 exports.saveDetailsFacture = async (details_facture_object, id_facture, session_object) => {
     try {
-        console.log(details_facture_object);
         if (details_facture_object.service_details) {
             // Sauvegarde du service
             let temp_service = new DetailsFacture({
@@ -39,8 +39,6 @@ exports.saveDetailsFacture = async (details_facture_object, id_facture, session_
 
 exports.saveFacture = async (data_facture, rendez_vous, client, session_object) => {
     try {
-        console.log(data_facture.devis_details, data_facture.total_devis);
-
         let facture_object = new Facture({
             rendez_vous: rendez_vous,
             montant_total: data_facture.total_devis,
@@ -111,3 +109,93 @@ exports.readFactureByClient = async (client) => {
 }
 
 
+exports.getFactures = async (params) =>{
+    const { page = 1, limit = 10, search = '', sortBy = 'date', orderBy = 'desc' } = params;
+    
+    const query = search ? {
+      $or: [
+        { numero_facture: { $regex: search, $options: 'i' } },
+      ]
+    } : {};
+
+    const factures = await Facture.find(query)
+      .populate('client', 'nom email')
+      .populate('rendez_vous')
+      .sort({ [sortBy]: orderBy === 'asc' ? 1 : -1 })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .lean();
+
+    const details = await DetailsFacture.find({
+      facture: { $in: factures.map(f => f._id) }
+    })
+      .populate('service')
+      .populate('produit')
+      .lean();
+
+    const paiements = await Paiement.find({
+      facture: { $in: factures.map(f => f._id) }
+    }).lean();
+
+    const totalItems = await Facture.countDocuments(query);
+
+    const enrichedFactures = factures.map(facture => ({
+      ...facture,
+      details: details.filter(d => d.facture.toString() === facture._id.toString()),
+      paiements: paiements.filter(p => p.facture.toString() === facture._id.toString())
+    }));
+
+    return {
+      factures: enrichedFactures,
+      totalItems,
+      totalPages: Math.ceil(totalItems / limit),
+      currentPage: page
+    };
+  }
+   exports.getFacturesByUser = async(params, userId)=> {  // Add userId parameter
+    const { page = 1, limit = 10, search = '', sortBy = 'date', orderBy = 'desc' } = params;
+    
+    // Add client filter to only get invoices where the user is the client
+    const query = {
+      client: userId,  // Filter by the current user's ID
+      ...(search ? {
+        $or: [
+          { numero_facture: { $regex: search, $options: 'i' } },
+        ]
+      } : {})
+    };
+
+    const factures = await Facture.find(query)
+      .populate('client', 'nom email')
+      .populate('rendez_vous')
+      .sort({ [sortBy]: orderBy === 'asc' ? 1 : -1 })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .lean();
+
+    const details = await DetailsFacture.find({
+      facture: { $in: factures.map(f => f._id) }
+    })
+      .populate('service')
+      .populate('produit')
+      .lean();
+
+    const paiements = await Paiement.find({
+      facture: { $in: factures.map(f => f._id) }
+    }).lean();
+
+    const totalItems = await Facture.countDocuments(query);
+
+    const enrichedFactures = factures.map(facture => ({
+      ...facture,
+      details: details.filter(d => d.facture.toString() === facture._id.toString()),
+      paiements: paiements.filter(p => p.facture.toString() === facture._id.toString())
+    }));
+
+    return {
+      factures: enrichedFactures,
+      totalItems,
+      totalPages: Math.ceil(totalItems / limit),
+      currentPage: page
+    };
+  }

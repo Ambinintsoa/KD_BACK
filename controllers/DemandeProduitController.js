@@ -1,30 +1,36 @@
-const DemandeProduitService = require('../services/DemandeProduitService');
-const { getIo } = require('../socket');
+const DemandeProduitService = require("../services/DemandeProduitService");
+const ProduitService = require("../services/ProduitService");
+const { getIo } = require("../socket");
 class DemandeProduitController {
   static async requestReassort(req, res) {
     try {
       const { entries } = req.body; // [{ produitId, quantity }]
-      const userId = req.userId;  // Supposons que l'utilisateur est authentifié via un middleware
+      const userId = req.userId; // Supposons que l'utilisateur est authentifié via un middleware
       if (!entries || !Array.isArray(entries) || entries.length === 0) {
-        return res.status(400).json({ error: 'Aucune entrée fournie' });
+        return res.status(400).json({ error: "Aucune entrée fournie" });
       }
 
-      const result = await DemandeProduitService.createReassortRequest(entries, userId);
+      const result = await DemandeProduitService.createReassortRequest(
+        entries,
+        userId
+      );
       // Émettre une notification aux admins via WebSocket
       const createdDemandes = result.data; // Tableau des demandes créées
-      createdDemandes.forEach(savedRequest => {
+      for (let i = 0; i < createdDemandes.length; i++) {
         const io = getIo(); // Récupérer l'instance de io
-  const request = {
-    _id: savedRequest._id,
-    productName: savedRequest.productName || entries.find(e => e.produitId === savedRequest.produit.toString())?.productName || 'Produit inconnu', // À ajuster selon votre modèle
-    quantity: savedRequest.quantite_demande,
-    requestedBy: savedRequest.utilisateur,
-    createdAt: savedRequest.date
-  };
+        const produit = await ProduitService.readById(
+          createdDemandes[i].produit
+        );
+        const request = {
+          _id: createdDemandes[i]._id,
+          productName: produit.nom_produit || "Produit inconnu", // À ajuster selon votre modèle
+          quantity: createdDemandes[i].quantite_demande,
+          requestedBy: createdDemandes[i].utilisateur,
+          createdAt: createdDemandes[i].date,
+        };
 
-  io.to('admin').emit('newRestockRequest', request);
-  console.log('Notification envoyée:', request);
-      });
+        io.to("admin").emit("newRestockRequest", request);
+      }
       res.status(201).json(result);
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -37,9 +43,9 @@ class DemandeProduitController {
       const params = {
         page: parseInt(page) || 1,
         limit: parseInt(limit) || 10,
-        search: search || '',
-        sortBy: sortBy || 'date',
-        orderBy: orderBy || 'desc'
+        search: search || "",
+        sortBy: sortBy || "date",
+        orderBy: orderBy || "desc",
       };
 
       const result = await DemandeProduitService.getReassortRequests(params);

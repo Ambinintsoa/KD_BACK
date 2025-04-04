@@ -35,9 +35,7 @@ io.use((socket, next) => {
 });
 
 // Gestion des connexions après validation du token
-io.on('connection', (socket) => {
-  console.log('Nouvelle connexion:', socket.id);
-  console.log('Utilisateur décodé:', socket.user); // Vérifier le contenu du token
+io.on('connection', (socket) => {// Vérifier le contenu du token
 
   if (socket.user.role === 'admin') {
     socket.join('admin');

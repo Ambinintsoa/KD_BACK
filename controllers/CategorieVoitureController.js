@@ -3,19 +3,19 @@ const CategorieVoiture = require("../models/CategorieVoiture")
 exports.save = async(req,res)=>{
     try {
         const categorieData = req.body;
-        if (!categorieData.nom_categorie) {
+        if (!categorieData.nom) {
             return res.status(400).json({
-                field: "nom_categorie",
+                field: "nom",
                 message: "Le nom de la categorie est obligatoire !"
             });
         }
           const existingCategorieVoitureCount = await CategorieVoitureService.countDocuments({
-                    nom_categorie: categorieData.nom_categorie.trim()
+                    nom: categorieData.nom.trim()
                 });
         
                 if (existingCategorieVoitureCount > 0) {
                     return res.status(400).json({
-                        field: "nom_categorie",
+                        field: "nom",
                         message: "Il y a déjà une categorie portant ce nom"
                     });
                 }

@@ -70,7 +70,6 @@ exports.update = async(data)=>{
 exports.delete=async(id)=>{
     try {
         const fournisseurSupprime = await Fournisseur.findByIdAndDelete(id);
-        console.log(fournisseurSupprime); // Affiche le fournisseur supprimé
     } catch (error) {
         console.error(error);
         throw error;

@@ -178,7 +178,6 @@ exports.import = async (req, res) => {
 
     res.status(200).json({ message: result.message });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ error: "Erreur interne du serveur" });
   }
 };
@@ -228,7 +227,6 @@ exports.export = async (req, res) => {
 exports.getAllServicesByCategories = async (req, res) => {
   try {
       let resultat=await ServiceService.getAllServicesByCategories();
-      console.log(resultat);
       res.status(201).json({ resultat:resultat });
 
   } catch (error) {

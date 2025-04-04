@@ -72,7 +72,6 @@ const getProduitsComplets = async (marque, service) => {
 
         for (const element of produit_usages) {
             if (element.produit) {
-                // console.log(marque, element.produit._id);
                 let temp_prix_unitaire = await getPrixProduit(toObjectId(marque), element.produit._id);
              
                 total_produit += element.quantite * temp_prix_unitaire;
@@ -128,7 +127,6 @@ exports.Calculate = async (nouveau_devis) => {
             nouveau_devis.voiture,
             nouveau_devis.services
         );
-        // console.log("final",ligne_devis,total_devis);
         return { ligne_devis, total_devis };
     } catch (error) {
         console.error(error);

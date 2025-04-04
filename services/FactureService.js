@@ -3,7 +3,6 @@ const DetailsFacture = require("../models/DetailsFacture");
 
 exports.saveDetailsFacture = async (details_facture_object, id_facture, session_object) => {
     try {
-        console.log(details_facture_object);
         if (details_facture_object.service_details) {
             // Sauvegarde du service
             let temp_service = new DetailsFacture({
@@ -39,8 +38,6 @@ exports.saveDetailsFacture = async (details_facture_object, id_facture, session_
 
 exports.saveFacture = async (data_facture, rendez_vous, client, session_object) => {
     try {
-        console.log(data_facture.devis_details, data_facture.total_devis);
-
         let facture_object = new Facture({
             rendez_vous: rendez_vous,
             montant_total: data_facture.total_devis,

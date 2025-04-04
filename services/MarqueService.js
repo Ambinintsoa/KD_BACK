@@ -60,7 +60,6 @@ exports.read = async (page, limit, search, sortBy, sortOrder, filters={}) => {
 
         return { marques, total };
     } catch (error) {
-        console.log(error.message)
         throw new Error("Erreur lors de la récupération des catégories");
     }
 };

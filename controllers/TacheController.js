@@ -23,7 +23,7 @@ exports.readBy= async (req, res) => {
         let page=req.params.page || 1;
         let limit=10;
         const offset = (page - 1) * limit;
-        let taches= await TacheService.readBy(offset,limit,req.body);
+        let taches= await TacheService.readBy(offset,limit,idRDV=req.params.idRDV);
         res.status(200).json({ taches:taches });
 
     } catch (error) {

@@ -29,14 +29,16 @@ exports.save = async (serviceData) => {
 // liste de services avec pagination
 exports.read = async (page, limit, search, sortBy, sortOrder) => {
     try {
-        const query = search
-        ? {
-            $or: [
-              { category_name: { $regex: search, $options: "i" } },
-              { nom_service: { $regex: search, $options: "i" } }
-            ]
-          }
-        : {};
+      const query = search
+      ? {
+          $or: [
+            { category_name: { $regex: search, $options: "i" } },
+            { nom_service: { $regex: search, $options: "i" } }
+          ],
+          statut: 0
+        }
+      : { statut: 0 };
+    
     
     const sortOption = {};
     sortOption[sortBy] = sortOrder === "desc" ? -1 : 1; // Tri ascendant ou descendant
@@ -47,17 +49,14 @@ exports.read = async (page, limit, search, sortBy, sortOrder) => {
     const services = await Service.find(query)
       .collation({ locale: "fr", strength: 2 }) // Collation pour tri insensible à la casse
       .sort(sortOption)
-      .where("statut", 0)
       .skip((page - 1) * limit)
       .limit(limit)
       .populate("categorie_service", "nom_categorie")
       .set("strictPopulate", false);
 
     const total = await Service.countDocuments(query);
-    console.log(services);
     return { services, total };
   } catch (error) {
-    console.log(error.message);
     throw new Error("Erreur lors de la récupération des services");
   }
 };
@@ -101,7 +100,6 @@ exports.readById = async (id) => {
 exports.update = async (data) => {
   try {
     const service = new Service(data);
-    console.log(service.nom_service);
     const initial_service = await Service.findOne({ _id: service._id });
 
     if (!initial_service) throw new Error("Aucun service correspondant !");
@@ -288,7 +286,6 @@ exports.import = async (filePath) => {
       return { success: false, errors };
     }
 
-    console.log("Données à insérer final :", services);
 
     await Service.insertMany(services); // Ajout de `await` pour s'assurer de l'insertion
 

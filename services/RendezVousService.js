@@ -10,10 +10,10 @@ const FactureService=require('./FactureService');
 
 // Fonction pour sauvegarder un rendez-vous (rdv)
 exports.save = async (rdv_data, objet_session) => {
+
     const error_field = [];
     try {
         const rdv = new RendezVous(rdv_data);
-        console.log(rdv.date_heure_debut, " date heure debut");
 
         // Vérification de la date
         if (rdv.date_heure_debut < new Date()) {
@@ -252,9 +252,10 @@ exports.assignRDV = async (data) => {
 // liste de tous les rendez-vous
 exports.read = async (offset, limit) => {
     try {
-        return await RendezVous.find().
-            skip(offset).
-            limit(limit).
+        console.log("coucou");
+        return await RendezVous.find({statut:1}).
+            // skip(offset).
+            // limit(limit).
             populate("client").
             populate("mecanicien").
             populate("voiture");
@@ -269,8 +270,8 @@ exports.read = async (offset, limit) => {
 exports.readBy = async (offset, limit, data) => {
     try {
         return await RendezVous.find(data).
-            skip(offset).
-            limit(limit).
+            // skip(offset).
+            // limit(limit).
             populate("client").
             populate("mecanicien").
             populate("voiture");
@@ -295,7 +296,6 @@ exports.readById = async (id) => {
 // liste de tous les rendez-vous par mecanicien entre deux dates
 exports.readByMecanicien = async (offset, limit, data) => {
     try {
-        // console.log(new Date(data.date_debut),new Date(data.date_fin));
         if (!data.date_debut) {
             data.date_debut = new Date();
         }
@@ -314,8 +314,8 @@ exports.readByMecanicien = async (offset, limit, data) => {
         };
 
         return await RendezVous.find(searchConditions).sort({ date_heure_debut: 1 }).
-            skip(offset).
-            limit(limit).
+            // skip(offset).
+            // limit(limit).
             populate("client").
             populate("mecanicien").
             populate("voiture");
@@ -332,7 +332,6 @@ exports.readByStatus = async (offset, limit, data) => {
         const searchConditions = {
             statut: data.statut
         };
-        console.log(data);
         return await RendezVous.find(searchConditions).
             skip(offset).
             limit(limit).
@@ -409,7 +408,6 @@ exports.getMecanicienDisponible = async (offset, limit, data) => {
             };
         }
 
-        console.log(condition);
         if (error_field.length > 0) {
             throw { message: "Validation failed", errors: error_field };
         }
@@ -427,7 +425,6 @@ exports.getMecanicienDisponible = async (offset, limit, data) => {
                 list_meca_pris.push(meca.mecanicien._id); // On récupère l'id du mécanicien
             }
         });
-        console.log(list_meca_pris);
         // Recherche des mécaniciens disponibles (qui ne sont pas dans list_meca_pris)
         let mecanicien_disponible = await Utilisateur.find({
             _id: { $nin: list_meca_pris }, role: "mecanicien"// $nin pour sélectionner les utilisateurs dont l'id n'est pas dans la liste
@@ -452,17 +449,19 @@ exports.getMecanicienDisponible = async (offset, limit, data) => {
 exports.updateRDV = async (data) => {
     const error_field = [];
     try {
+        console.log(data);
         const rdv = new RendezVous(data);
+        console.log(rdv);
         if (!rdv._id) {
             error_field.push({ field: "id", message: "Veuiller fournir un Id pour le rendez vous!" });
-            throw { message: error.message, errors: error.errors };
+            // throw { message: error.message, errors: error.errors };
 
         }
 
-        const rdv_initial = RendezVous.find({ _id: rdv_id });
+        const rdv_initial = await RendezVous.findOne({ _id: rdv._id });
         if (!rdv_initial) {
             error_field.push({ field: "id", message: "Veuiller fournir un Id valide pour le rendez vous!" });
-            throw { message: error.message, errors: error.errors };
+            // throw { message: error.message, errors: error.errors };
         }
         if (rdv.date_heure_fin) {
             if (rdv.date_heure_debut >= rdv.date_heure_fin) {
@@ -510,7 +509,7 @@ exports.updateRDV = async (data) => {
         rdv_initial.statut = (rdv.statut) || rdv_initial.statut;
         rdv_initial.etat = (rdv.etat) || rdv_initial.etat;
 
-        rdv_initial.save();
+        await rdv_initial.save();
 
     } catch (error) {
         console.error(error);

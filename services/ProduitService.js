@@ -27,9 +27,10 @@ exports.save = async (produitData) => {
 // liste de produits avec pagination
 exports.read = async (page, limit, search, sortBy, sortOrder) => {
   try {
-    const query = search
-      ? { nom_produit: { $regex: search, $options: "i" } } // Recherche insensible à la casse
-      : {};
+    const query = {
+      ...(search ? { nom_produit: { $regex: search, $options: "i" } } : {}),
+      statut: 0 // <-- on filtre dans la recherche ET le count
+  };
 
     const sortOption = {};
     sortOption[sortBy] = sortOrder === "desc" ? -1 : 1; // Tri ascendant ou descendant
@@ -39,14 +40,12 @@ exports.read = async (page, limit, search, sortBy, sortOrder) => {
     const produits = await Produit.find(query)
       .collation({ locale: "fr", strength: 2 })
       .sort(sortOption)
-      .where("statut", 0)
       .skip((page - 1) * limit)
       .limit(limit);
     const total = await Produit.countDocuments(query);
 
     return { produits, total };
   } catch (error) {
-    console.log(error.message);
     throw new Error("Erreur lors de la récupération des catégories");
   }
 };

@@ -10,7 +10,6 @@ function checkRole(token,role,req,next){
         const token_without_bearer = token.split(' ')[1];
         const decoded = jwt.verify(token_without_bearer, process.env.SECRET_KEY_ACCESS);
         req.userId = decoded.userId;
-        console.log(decoded.role);
         if(decoded.role===role){ 
             next()
         }else{

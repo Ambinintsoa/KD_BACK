@@ -40,3 +40,23 @@ exports.readDetailFactureByFacture=async(req,res)=>{
         res.status(500).json({ error: error.message });
     }
 }
+
+exports.getFactures = async(req, res)=> {
+    try {
+      const factures = await FactureService.getFactures(req.query);
+      res.json(factures);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+
+exports.getFacturesByClient = async(req, res) =>{
+    try {
+      // Assuming user ID is available in req.user from authentication middleware
+      const userId = req.userId; // Adjust this based on your auth implementation
+      const factures = await FactureService.getFacturesByUser(req.query, userId);
+      res.json(factures);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }

@@ -54,9 +54,10 @@ exports.export=async()=>{
 // liste de categories avec pagination
 exports.read = async (page, limit, search, sortBy, sortOrder, filters = {}) => {
   try {
-    const query = search
-      ? { nom_categorie: { $regex: search, $options: "i" } } // Recherche insensible à la casse
-      : {};
+    const query = {
+      ...(search ? { nom_categorie: { $regex: search, $options: "i" } } : {}),
+      statut: 0 // <-- on filtre dans la recherche ET le count
+  };
 
     const sortOption = {};
     sortOption[sortBy] = sortOrder === "desc" ? -1 : 1; // Tri ascendant ou descendant
@@ -66,14 +67,12 @@ exports.read = async (page, limit, search, sortBy, sortOrder, filters = {}) => {
     const categories = await CategorieService.find(query)
       .collation({ locale: "fr", strength: 2 })
       .sort(sortOption)
-      .where("statut", 0)
       .skip((page - 1) * limit)
       .limit(limit);
     const total = await CategorieService.countDocuments(query);
 
     return { categories, total };
   } catch (error) {
-    console.log(error.message);
     throw new Error("Erreur lors de la récupération des catégories");
   }
 };

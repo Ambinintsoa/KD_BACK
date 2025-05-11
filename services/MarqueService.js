@@ -41,10 +41,10 @@ exports.getAll = async (query = {}, sortOption = { nom_marque: 1 }) => {
 // liste de marques avec pagination
 exports.read = async (page, limit, search, sortBy, sortOrder, filters={}) => {
     try {
-        const query = search
-            ? { nom_marque: { $regex: search, $options: "i" } } // Recherche insensible à la casse
-            : {};
-
+        const query = {
+            ...(search ? { nom_marque: { $regex: search, $options: "i" } } : {}),
+            statut: 0 // <-- on filtre dans la recherche ET le count
+        };
         const sortOption = {};
         sortOption[sortBy] = sortOrder === "desc" ? -1 : 1; // Tri ascendant ou descendant
         if (page < 1) {
@@ -53,14 +53,12 @@ exports.read = async (page, limit, search, sortBy, sortOrder, filters={}) => {
         const marques = await Marque.find(query)
         .collation({ locale: 'fr', strength: 2 })
             .sort(sortOption)
-            .where('statut',1)
             .skip((page - 1) * limit)
             .limit(limit);
         const total = await Marque.countDocuments(query);
 
         return { marques, total };
     } catch (error) {
-        console.log(error.message)
         throw new Error("Erreur lors de la récupération des catégories");
     }
 };

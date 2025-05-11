@@ -87,7 +87,6 @@ exports.update = async (data) => {
 exports.delete = async (id) => {
     try {
         const usage_produit_serviceSupprime = await UsageProduitService.findByIdAndDelete(id);
-        console.log(usage_produit_serviceSupprime); // Affiche le usage_produit_service supprimé
     } catch (error) {
         console.error(error);
         throw error;

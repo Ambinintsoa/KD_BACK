@@ -39,7 +39,6 @@ io.on('connection', (socket) => {// Vérifier le contenu du token
 
   if (socket.user.role === 'admin') {
     socket.join('admin');
-    console.log(`Utilisateur ${socket.user.userId} a rejoint la salle admin`);
   } else {
     console.log('Utilisateur non admin, rôle:', socket.user.role);
   }

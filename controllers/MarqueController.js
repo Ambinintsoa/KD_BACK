@@ -1,5 +1,6 @@
 const MarqueService= require("../services/MarqueService");
-const Marque = require("../models/Marque")
+const Marque = require("../models/Marque");
+const { filter } = require("lodash");
 exports.save = async(req,res)=>{
     try {
         const marqueData = req.body;
@@ -36,7 +37,8 @@ exports.read = async (req, res) => {
         let search = req.query.search || ''; 
         let sortBy = req.query.sortBy || 'nom_marque'; 
         let sortOrder = req.query.orderBy; 
-        let { marques, total } = await MarqueService.read(page, limit, search, sortBy, sortOrder);
+        const filters = { statut: 0 };
+        let { marques, total } = await MarqueService.read(page, limit, search, sortBy, sortOrder, filters);
         res.status(200).json({ 
             marques,
             currentPage: page,

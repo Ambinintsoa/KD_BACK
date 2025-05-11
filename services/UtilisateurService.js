@@ -64,7 +64,7 @@ exports.login = async (data) => {
 }
 
 // lit tous les utilisateurs
-exports.read = async (page = 1, limit = 10, search = '', sortBy = 'nom', sortOrder = 'asc') => {
+exports.read = async (page = 1, limit = 10, search = '', sortBy = 'nom', sortOrder = 'asc', filters) => {
     try {
       // Construire les critères de recherche
       const query = search
@@ -77,7 +77,25 @@ exports.read = async (page = 1, limit = 10, search = '', sortBy = 'nom', sortOrd
             ]
           }
         : {};
-  
+  // Appliquer des filtres supplémentaires basés sur les conditions choisies
+if (filters && Object.keys(filters).length > 0) {
+  Object.entries(filters).forEach(([field, [{ value, matchMode }]]) => {
+    if (value !== undefined && value !== null && value !== '') {
+      switch (matchMode) {
+        case 'contains':
+          query[field] = { $regex: value, $options: 'i' };  // Recherche insensible à la casse
+          break;
+        case 'equals':
+          query[field] = value;  // Recherche exacte
+          break;
+        // Ajoute d'autres cas selon les matchModes souhaités
+        default:
+          break;
+      }
+    }
+  });
+}
+
       // Définir l'ordre de tri
       const sort = {};
       sort[sortBy] = sortOrder === 'desc' ? -1 : 1;

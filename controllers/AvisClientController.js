@@ -1,10 +1,15 @@
 const AvisClientService = require('../services/AvisClientService');
-
+const { getIo } = require("../socket");
 class AvisClientController {
   static async createAvis(req, res) {
     try {
       const avisData = { ...req.body, client: req.userId }; // client = utilisateur connecté
       const result = await AvisClientService.createAvis(avisData);
+      const request = {
+        _id: result.data._id
+      };
+      const io = getIo();
+      io.to("admin").emit("newComment", request);
       res.status(201).json(result);
     } catch (error) {
       res.status(500).json({ error: error.message });

@@ -99,8 +99,9 @@ exports.read = async (req, res) => {
       let search = req.query.search || '';
       let sortBy = req.query.sortBy || 'nom';
       let sortOrder = req.query.orderBy || 'asc'; // Utiliser "orderBy" comme dans votre exemple
-  
-      const { utilisateurs, total } = await userService.read(page, limit, search, sortBy, sortOrder);
+      let filters  = JSON.parse(req.query.filters )|| null ;
+      console.log("Objet :", JSON.stringify(filters, null, 2));
+      const { utilisateurs, total } = await userService.read(page, limit, search, sortBy, sortOrder, filters);
   
       res.status(200).json({
         utilisateurs,

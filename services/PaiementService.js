@@ -27,32 +27,42 @@ exports.save = async (paiement_data) => {
 
 
         let reste = await this.getRestePaiement(paiement.facture);
-        console.log(reste, "restee");
-        if (reste != 0) {
+       
+       // Démarrer la transaction
+        session.startTransaction();
 
-            session.startTransaction();  // Démarrer la transaction
-            let is_completed = false;
-            if (paiement.montant_payer >= reste) {
-                is_completed = true;
-                paiement.montant_payer = paiement.montant_payer - reste; // Déduit `reste` si nécessaire
-            }
+        let is_completed = false;
 
-            await paiement.save({ session });
-
-            if (is_completed) {
-                const temp_facture = await Facture.findOne({ _id: paiement.facture });
-                if (temp_facture) {
-                    temp_facture.etat = 1; // Marquer la facture comme payée
-                    await temp_facture.save({ session });
-                }
-            }
-            await session.commitTransaction();
-
-            // Terminer la session
-            session.endSession();
+        // Vérification du montant payé
+        if (paiement.montant_payer >= reste || reste === 0) {
+            is_completed = true;
+            paiement.montant_payer -= reste; // Déduit `reste` si nécessaire
         }
 
+        // Enregistrer le paiement dans la session
+        await paiement.save({ session });
 
+        console.log(is_completed); // true
+
+        if (is_completed) {
+            // Trouver la facture associée
+            const temp_facture = await Facture.findOne({ _id: paiement.facture }).session(session);
+            
+            if (temp_facture) {
+                temp_facture.statut = 1; // Marquer la facture comme payée
+                console.log("Facture trouvée et mise à jour.");
+
+                // Enregistrer la facture mise à jour
+                await temp_facture.save({ session });
+            } else {
+                console.error("Facture introuvable !");
+            }
+        }
+
+        // Valider la transaction
+        await session.commitTransaction();
+        console.log("Transaction réussie.");
+        
 
     } catch (error) {
         // console.error(error);
@@ -91,7 +101,7 @@ exports.getRestePaiement = async (id_facture) => {
             }
 
         ]);
-        console.log(paiementDu.montant_total, "<=du", paiementFait[0].total, "montant fait")
+     
         if (paiementDu.montant_total <= paiementFait[0].total) {
             return 0;
         } else if (paiementFait.length == 0) {

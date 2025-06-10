@@ -2,7 +2,8 @@ const PaiementService=require('../services/PaiementService');
 
 exports.save=async(req,res)=>{
     try {
-        await PaiementService.save(req.body);
+        // console.log(req.body);
+        await PaiementService.save(req.body.data);
         res.status(200).json({"message":"Payer avec succes"});
     }
     catch (error) {
@@ -10,6 +11,7 @@ exports.save=async(req,res)=>{
         res.status(500).json({ error: error.message });
     }
 }
+
 
 exports.read = async (req, res) => {
     try {

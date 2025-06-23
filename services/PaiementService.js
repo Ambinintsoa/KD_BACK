@@ -40,7 +40,7 @@ exports.save = async (paiement_data) => {
         }
 
         // Enregistrer le paiement dans la session
-        await paiement.save({ session });
+        const saved_paiement=await paiement.save({ session });
 
         console.log(is_completed); // true
 
@@ -62,7 +62,7 @@ exports.save = async (paiement_data) => {
         // Valider la transaction
         await session.commitTransaction();
         console.log("Transaction réussie.");
-        
+        return saved_paiement; // Retourner le paiement enregistré
 
     } catch (error) {
         // console.error(error);

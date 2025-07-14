@@ -37,7 +37,7 @@ exports.read = async (req, res) => {
         let search = req.query.search || ''; 
         let sortBy = req.query.sortBy || 'nom_marque'; 
         let sortOrder = req.query.orderBy; 
-        const filters = { statut: 0 };
+        const filters = { statut: 1 }; // Filtre pour les marques actives
         let { marques, total } = await MarqueService.read(page, limit, search, sortBy, sortOrder, filters);
         res.status(200).json({ 
             marques,
@@ -131,8 +131,3 @@ exports.delete = async (req, res) => {
         res.status(500).json({ error: "Une erreur est survenue lors de la suppression des marques", details: error.message });
     }
 };
-
-
-
-
-

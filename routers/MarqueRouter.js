@@ -15,5 +15,3 @@ marqueRouter.get("/id/:id",[verifyToken], MarqueController.readById);
 
 
 module.exports = marqueRouter;
-
-

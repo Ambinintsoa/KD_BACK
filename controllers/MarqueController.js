@@ -131,8 +131,3 @@ exports.delete = async (req, res) => {
         res.status(500).json({ error: "Une erreur est survenue lors de la suppression des marques", details: error.message });
     }
 };
-
-
-
-
-

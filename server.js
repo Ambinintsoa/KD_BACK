@@ -44,7 +44,6 @@ app.use('/tache', require('./routers/TacheRouter'));
 app.use('/devis', require('./routers/DevisRouter'));
 app.use('/graph', require('./routers/GraphRouter'));
 app.use('/facture', require('./routers/FactureRouter'));
-app.use('/paiement', require('./routers/PaiementRouter'));
 
 // Route principale
 app.get("/", (req, res) => {

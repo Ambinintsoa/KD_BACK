@@ -2,16 +2,14 @@ const PaiementService=require('../services/PaiementService');
 
 exports.save=async(req,res)=>{
     try {
-        // console.log(req.body);
-        const paiement=await PaiementService.save(req.body.data);
-        res.status(200).json({"message":"Payer avec succes","data":paiement});
+        await PaiementService.save(req.body);
+        res.status(200).json({"message":"Payer avec succes"});
     }
     catch (error) {
         console.error(error);
         res.status(500).json({ error: error.message });
     }
 }
-
 
 exports.read = async (req, res) => {
     try {

@@ -16,7 +16,6 @@ serviceRouter.get("/search/:page",[verifyToken], ServiceController.readBy);
 serviceRouter.get("/id/:id",[verifyToken], ServiceController.readById);
 serviceRouter.get("/serviceCategorie", ServiceController.getAllServicesByCategories);
 
-serviceRouter.get("/history",[verifyToken], ServiceController.ServiceHistoryClient);
 
 serviceRouter.post("/import",upload.single('file'),[verifyToken], ServiceController.import);
 serviceRouter.get("/export",[verifyToken], ServiceController.export);

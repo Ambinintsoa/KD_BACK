@@ -13,7 +13,9 @@ exports.saveDetailsFacture = async (details_facture_object, id_facture, session_
             });
             await temp_service.save({ session: session_object });
 
-        } 
+        }
+
+
 
         // Sauvegarde des produits s'il y en a
         if (details_facture_object.produits?.length > 0) {

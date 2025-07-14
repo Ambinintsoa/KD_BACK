@@ -301,7 +301,7 @@ exports.readByMecanicien = async (offset, limit, data) => {
         }
         if (!data.date_fin) {
             let temp_date = new Date(data.date_debut);
-            temp_date.setDate(temp_date.getDate()+365) // Ajoute 7 jour
+            temp_date.setDate(temp_date.getDate() + 7); // Ajoute 7 jour
             data.date_fin = temp_date;
         }
 

@@ -2,9 +2,6 @@ const Service = require("../models/Service");
 const ServiceService = require("../services/ServiceService");
 const ExcelJS = require("exceljs");
 const fs = require("fs");
-const jwt = require('jsonwebtoken');
-
-
 exports.save = async (req, res) => {
   try {
     const serviceData = req.body;
@@ -50,7 +47,7 @@ exports.save = async (req, res) => {
   }
 };
 
-
+  
 exports.read = async (req, res) => {
   try {
     let page = parseInt(req.query.page) || 1;
@@ -229,51 +226,11 @@ exports.export = async (req, res) => {
 
 exports.getAllServicesByCategories = async (req, res) => {
   try {
-    let resultat = await ServiceService.getAllServicesByCategories();
-    res.status(201).json({ resultat: resultat });
+      let resultat=await ServiceService.getAllServicesByCategories();
+      res.status(201).json({ resultat:resultat });
 
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: error.message });
-  }
-}
-
-// function that get the history of services by user generally the client
-
-exports.ServiceHistoryClient = async (req, res) => {
-  try {
-    let page = parseInt(req.query.page) || 1;
-    let limit = parseInt(req.query.limit) || 10;
-    let search = req.query.search || "";
-    let sortBy = req.query.sortBy || "nom_service";
-    let sortOrder = req.query.orderBy;
-
-    const token = req.header('Authorization');
-
-    if (!token || !token.startsWith('Bearer ')) {
-      return res.status(401).json({ error: 'Permission non accordé' });
-    }
-
-    const token_without_bearer = token.split(' ')[1];
-    const decoded = jwt.verify(token_without_bearer, process.env.SECRET_KEY_ACCESS);
-    const client = decoded.userId;
-    console.log("Before calling",client);
-
-
-    const { data, total } = await ServiceService.serviceHistory(client, page,
-      limit,
-      search,
-      sortBy,
-      sortOrder);
-
-   res.status(200).json({
-      data,
-      currentPage: page,
-      totalPages: Math.ceil(total / limit),
-      totalItems: total,
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: error.message });
+      console.error(error);
+      res.status(500).json({ error: error.message });
   }
 }
